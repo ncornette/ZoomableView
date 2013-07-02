@@ -31,7 +31,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
 
         void onSingleTapConfirmed();
 
-        void onTouchDep(float x, float y);
+        void onTouch(float x, float y);
 
         void onSingleTapCancelled();
     }
@@ -196,7 +196,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
 
         // Use Listener
         if (mapListener != null) {
-            mapListener.onTouchDep(e.getX(), e.getY());
+            mapListener.onTouch(e.getX(), e.getY());
         }
 
         moved = false;

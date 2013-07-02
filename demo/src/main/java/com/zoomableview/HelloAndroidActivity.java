@@ -18,7 +18,8 @@ public class HelloAndroidActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final DepMapViewScalable zoomable = (DepMapViewScalable) findViewById(R.id.zoomable);
+        final DepMapViewTouchable zoomable = (DepMapViewTouchable) findViewById(R.id.zoomable);
+
         zoomable.setTouchMapListener(new TouchMapListener() {
 
             @Override
@@ -26,7 +27,7 @@ public class HelloAndroidActivity extends Activity {
             }
 
             @Override
-            public void onTouchDep(float arg0, float arg1) {
+            public void onTouch(float arg0, float arg1) {
             }
 
             @Override
