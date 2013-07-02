@@ -39,7 +39,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     public DepMapViewTouchable(Context context, AttributeSet attrs) {
         super(context, attrs);
         transform = new Transformation();
-        gestureScanner = new GestureDetector(this);
+        gestureScanner = new GestureDetector(getContext(), this);
         gestureScanner.setOnDoubleTapListener(this);
     }
 

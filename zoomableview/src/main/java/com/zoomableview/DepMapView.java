@@ -1,6 +1,7 @@
 package com.zoomableview;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -29,7 +30,13 @@ public class DepMapView extends View {
         mapPaint = new Paint();
         mapPaint.setFilterBitmap(true);
 
-        map = null;
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_DepMapView);
+        int resourceId = a.getResourceId(R.styleable.com_zoomableview_DepMapView_mapref, 0);
+        a.recycle();
+
+        if (resourceId != 0) {
+            map = BitmapFactory.decodeResource(getResources(), resourceId);
+        }
     }
 
     /**

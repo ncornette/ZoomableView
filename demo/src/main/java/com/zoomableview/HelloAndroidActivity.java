@@ -19,7 +19,6 @@ public class HelloAndroidActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final DepMapViewScalable zoomable = (DepMapViewScalable) findViewById(R.id.zoomable);
-        zoomable.setMap(R.drawable.chicken_cartoon_500);
         zoomable.setTouchMapListener(new TouchMapListener() {
 
             @Override
