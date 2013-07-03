@@ -16,7 +16,7 @@ public class MapScaleAnim extends AnimationSet {
     private ScaleAnimation scaleAnimation;
     private TranslateAnimation translateAnimation;
 
-    public void set(float fromScale, float toScale, float fromX, float toX, float fromY, float toY, int duration) {
+    private void set(float fromScale, float toScale, float fromX, float toX, float fromY, float toY, int duration) {
         if (!getAnimations().isEmpty()) {
             getAnimations().clear();
             reset();
@@ -36,7 +36,7 @@ public class MapScaleAnim extends AnimationSet {
         setFillAfter(true);
     }
 
-    public void set(Matrix start, Matrix target, int duration) {
+    private void set(Matrix start, Matrix target, int duration) {
         start.getValues(iMatrixs);
         target.getValues(tMatrixs);
 
@@ -72,11 +72,18 @@ public class MapScaleAnim extends AnimationSet {
         super(true);
         start.getValues(iMatrixs);
 
-        Matrix target = new Matrix();
         tMatrixs[Matrix.MSCALE_X] = scale * iMatrixs[Matrix.MSCALE_X];
         tMatrixs[Matrix.MSCALE_Y] = scale * iMatrixs[Matrix.MSCALE_Y];
-        tMatrixs[Matrix.MTRANS_X] = scale * iMatrixs[Matrix.MTRANS_X] + toX - x * scale;
-        tMatrixs[Matrix.MTRANS_Y] = scale * iMatrixs[Matrix.MTRANS_Y] + toY - y * scale;
+
+        float scaledStartX = scale * iMatrixs[Matrix.MTRANS_X];
+        float shiftX = toX - x * scale;
+        tMatrixs[Matrix.MTRANS_X] = scaledStartX + shiftX;
+
+        float scaledStartY = scale * iMatrixs[Matrix.MTRANS_Y];
+        float shiftY = toY - y * scale;
+        tMatrixs[Matrix.MTRANS_Y] = scaledStartY + shiftY;
+
+        Matrix target = new Matrix();
         target.setValues(tMatrixs);
 
         set(start, target, duration);

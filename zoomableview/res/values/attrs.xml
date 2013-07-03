@@ -3,6 +3,10 @@
 
     <declare-styleable name="com.zoomableview.DepMapView">
         <attr name="mapref" format="reference" />
+        <attr name="autoZoomFill" format="boolean" />
+        <attr name="autoZoomLevel" format="float" />
+        <attr name="maxZoomFill" format="boolean" />
+        <attr name="maxZoomLevel" format="float" />
     </declare-styleable>
 
 </resources>

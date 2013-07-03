@@ -1,6 +1,7 @@
 package com.zoomableview;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Matrix;
 import android.graphics.Matrix.ScaleToFit;
 import android.graphics.PointF;
@@ -22,6 +23,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     protected MapScaleAnim mapScaleAnim;
     private GestureDetector gestureScanner;
     protected TouchMapListener mapListener;
+    private RectF tmpRect = new RectF();
 
     public static interface TouchMapListener {
 
@@ -41,6 +43,13 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         transform = new Transformation();
         gestureScanner = new GestureDetector(getContext(), this);
         gestureScanner.setOnDoubleTapListener(this);
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_DepMapView);
+        mAutoZoomFill = a.getBoolean(R.styleable.com_zoomableview_DepMapView_autoZoomFill, false);
+        mAutoZoomLevel = a.getFloat(R.styleable.com_zoomableview_DepMapView_autoZoomLevel, 2f);
+        mMaxZoomFill = a.getBoolean(R.styleable.com_zoomableview_DepMapView_maxZoomFill, false);
+        mMaxZoomLevel = a.getFloat(R.styleable.com_zoomableview_DepMapView_maxZoomLevel, 3f);
+        a.recycle();
     }
 
     public void setTouchMapListener(TouchMapListener mapListener) {
@@ -61,6 +70,10 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     private RectF rectMap = new RectF();
     private RectF rectMapUpdate = new RectF();
     private boolean moved;
+    private boolean mAutoZoomFill;
+    private float mAutoZoomLevel;
+    private boolean mMaxZoomFill;
+    private float mMaxZoomLevel;
 
     public static float distance(PointF p, PointF q)
     {
@@ -117,7 +130,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     }
 
     public void zoomOnScreen(float x, float y) {
-        mapScaleAnim = new MapScaleAnim(matrixOrigin, x, y, getWidth() / 2, getHeight() / 2, 2f, 500);
+        mapScaleAnim = new MapScaleAnim(matrixOrigin, x, y, getWidth() / 2, getHeight() / 2, getAutoZoomLevel(), 500);
         mapScaleAnim.initialize(0, 0, getWidth(), getHeight());
         mapScaleAnim.start();
         mapZoomHandler.handleMessage(null);
@@ -150,6 +163,27 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         }
     }
 
+    protected float getFillBorderZoomLevel() {
+        matrixOrigin.mapRect(tmpRect, rectMapOrigin);
+        return rectView.width() / tmpRect.width() * rectView.height() / tmpRect.height();
+    }
+
+    protected float getAutoZoomLevel() {
+        if (mAutoZoomFill) {
+            return getFillBorderZoomLevel();
+        } else {
+            return mAutoZoomLevel;
+        }
+    }
+
+    protected float getMaxZoomLevel() {
+        if (mMaxZoomFill) {
+            return getFillBorderZoomLevel();
+        } else {
+            return mMaxZoomLevel;
+        }
+    }
+
     @Override
     public boolean onDoubleTap(MotionEvent e) {
         Log.i(getClass().getSimpleName(), "onDoubleTap");
@@ -171,7 +205,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         if ((zoomed || zoomIfNeeded)) {
             matrix.mapPoints(pointF);
             if (!zoomed && zoomIfNeeded) {
-                mapScaleAnim = new MapScaleAnim(matrix, pointF[0], pointF[1], getWidth() / 2, getHeight() / 2, 2, 500);
+                mapScaleAnim = new MapScaleAnim(matrix, pointF[0], pointF[1], getWidth() / 2, getHeight() / 2, getAutoZoomLevel(), 500);
                 zoomed = true;
             } else {
                 mapScaleAnim = new MapScaleAnim(matrix, pointF[0], pointF[1], getWidth() / 2, getHeight() / 2, 1, 500);

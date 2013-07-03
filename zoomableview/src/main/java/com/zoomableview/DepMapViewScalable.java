@@ -85,9 +85,9 @@ public class DepMapViewScalable extends DepMapViewTouchable implements OnScaleGe
         if (matrixValues[Matrix.MSCALE_X] < matrixOriginValues[Matrix.MSCALE_X]) {
             mapScaleAnim = new MapScaleAnim(matrix, matrixOrigin, 200);
             zoomed = false;
-        } else if (matrixValues[Matrix.MSCALE_X] > matrixOriginValues[Matrix.MSCALE_X] * 3f) {
+        } else if (matrixValues[Matrix.MSCALE_X] > matrixOriginValues[Matrix.MSCALE_X] * getMaxZoomLevel()) {
             mapScaleAnim = new MapScaleAnim(matrix, getWidth() / 2, getHeight() / 2, getWidth() / 2, getHeight() / 2,
-                    matrixOriginValues[Matrix.MSCALE_X] / matrixValues[Matrix.MSCALE_X] * 3f, 200);
+                    matrixOriginValues[Matrix.MSCALE_X] / matrixValues[Matrix.MSCALE_X] * getMaxZoomLevel(), 200);
         } else {
             return;
         }
