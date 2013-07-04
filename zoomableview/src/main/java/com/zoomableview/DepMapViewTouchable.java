@@ -163,19 +163,25 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         }
     }
 
-    protected float getFillBorderZoomLevel() {
+    private float getFillBorderZoomLevel() {
         matrixOrigin.mapRect(tmpRect, rectMapOrigin);
         return rectView.width() / tmpRect.width() * rectView.height() / tmpRect.height();
     }
 
+    /**
+     * @return zoom level for auto zoom request or Max zoom allowed.
+     */
     protected float getAutoZoomLevel() {
         if (mAutoZoomFill) {
-            return getFillBorderZoomLevel();
+            return Math.min(getMaxZoomLevel(), getFillBorderZoomLevel());
         } else {
             return mAutoZoomLevel;
         }
     }
 
+    /**
+     * @return max allowed zoom level.
+     */
     protected float getMaxZoomLevel() {
         if (mMaxZoomFill) {
             return getFillBorderZoomLevel();
