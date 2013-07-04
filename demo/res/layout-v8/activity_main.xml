@@ -10,7 +10,7 @@
     <com.zoomableview.DepMapViewScalable
         android:id="@+id/zoomable"
         app:mapref="@drawable/chicken_cartoon_500"
-        app:autoZoomFill="true"
+        style="@style/demo_zoom_default"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         />

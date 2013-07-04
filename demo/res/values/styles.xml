@@ -17,4 +17,9 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <style name="demo_zoom_default">
+        <item name="autoZoomFill">true</item>
+        <item name="maxZoomLevel">3</item>
+    </style>
+    
 </resources>
