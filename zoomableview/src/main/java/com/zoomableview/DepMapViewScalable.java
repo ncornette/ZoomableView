@@ -92,7 +92,7 @@ public class DepMapViewScalable extends DepMapViewTouchable implements OnScaleGe
             return;
         }
 
-        mapScaleAnim.initialize(0, 0, getWidth(), getHeight());
+        mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
         mapScaleAnim.setInterpolator(new BounceInterpolator());
         mapScaleAnim.start();
         mapZoomHandler.handleMessage(null);

@@ -124,7 +124,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
                     // Create matrix for translation from current rect to new rect
                     matrix2.setRectToRect(rectMapOrigin, rectMapUpdate, ScaleToFit.FILL);
                     mapScaleAnim = new MapScaleAnim(matrix, matrix2, 200);
-                    mapScaleAnim.initialize(0, 0, getWidth(), getHeight());
+                    mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
                     mapScaleAnim.start();
                     mapZoomHandler.handleMessage(null);
                 }
@@ -135,7 +135,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
 
     public void zoomOnScreen(float x, float y) {
         mapScaleAnim = new MapScaleAnim(matrixOrigin, x, y, getWidth() / 2, getHeight() / 2, getAutoZoomLevel(), 500);
-        mapScaleAnim.initialize(0, 0, getWidth(), getHeight());
+        mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
         mapScaleAnim.start();
         mapZoomHandler.handleMessage(null);
         zoomed = true;
@@ -147,7 +147,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
 
     public void zoomOut(int duration) {
         mapScaleAnim = new MapScaleAnim(matrix, matrixOrigin, duration);
-        mapScaleAnim.initialize(0, 0, getWidth(), getHeight());
+        mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
         mapScaleAnim.start();
         mapZoomHandler.handleMessage(null);
         zoomed = false;
@@ -220,7 +220,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
             } else {
                 mapScaleAnim = new MapScaleAnim(matrix, pointF[0], pointF[1], getWidth() / 2, getHeight() / 2, 1, 500);
             }
-            mapScaleAnim.initialize(0, 0, getWidth(), getHeight());
+            mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
             mapScaleAnim.start();
             mapZoomHandler.handleMessage(null);
         }
