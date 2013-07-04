@@ -1,7 +1,6 @@
 package com.zoomableview;
 
 import android.graphics.Matrix;
-import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
@@ -22,10 +21,7 @@ public class MapScaleAnim extends AnimationSet {
             reset();
         }
 
-        scaleAnimation = new ScaleAnimation(
-                fromScale, toScale, fromScale, toScale,
-                Animation.RELATIVE_TO_SELF, 0.50f,
-                Animation.RELATIVE_TO_SELF, 0.50f);
+        scaleAnimation = new ScaleAnimation(fromScale, toScale, fromScale, toScale);
         scaleAnimation.setDuration(duration);
         addAnimation(scaleAnimation);
 
