@@ -14,31 +14,23 @@ public class MapScaleAnim extends AnimationSet {
     private float[] tMatrixs = new float[9];
     private ScaleAnimation scaleAnimation;
     private TranslateAnimation translateAnimation;
+    private final int mDuration;
 
-    private void set(float fromScale, float toScale, float fromX, float toX, float fromY, float toY, int duration) {
+    private void set(float fromScale, float toScale, float fromX, float toX, float fromY, float toY) {
         if (!getAnimations().isEmpty()) {
             getAnimations().clear();
             reset();
         }
 
         scaleAnimation = new ScaleAnimation(fromScale, toScale, fromScale, toScale);
-        scaleAnimation.setDuration(duration);
+        scaleAnimation.setDuration(mDuration);
         addAnimation(scaleAnimation);
 
         translateAnimation = new TranslateAnimation(fromX, toX, fromY, toY);
-        translateAnimation.setDuration(duration);
+        translateAnimation.setDuration(mDuration);
         addAnimation(translateAnimation);
 
         setFillAfter(true);
-    }
-
-    private void set(Matrix start, Matrix target, int duration) {
-        start.getValues(iMatrixs);
-        target.getValues(tMatrixs);
-
-        set(iMatrixs[Matrix.MSCALE_X], tMatrixs[Matrix.MSCALE_X],
-                iMatrixs[Matrix.MTRANS_X], tMatrixs[Matrix.MTRANS_X],
-                iMatrixs[Matrix.MTRANS_Y], tMatrixs[Matrix.MTRANS_Y], duration);
     }
 
     /**
@@ -50,7 +42,9 @@ public class MapScaleAnim extends AnimationSet {
      */
     public MapScaleAnim(Matrix start, Matrix target, int duration) {
         super(true);
-        set(start, target, duration);
+        this.mDuration = duration;
+        start.getValues(iMatrixs);
+        target.getValues(tMatrixs);
     }
 
     /**
@@ -66,6 +60,7 @@ public class MapScaleAnim extends AnimationSet {
      */
     public MapScaleAnim(Matrix start, float x, float y, float toX, float toY, float scale, int duration) {
         super(true);
+        this.mDuration = duration;
         start.getValues(iMatrixs);
 
         tMatrixs[Matrix.MSCALE_X] = scale * iMatrixs[Matrix.MSCALE_X];
@@ -78,11 +73,16 @@ public class MapScaleAnim extends AnimationSet {
         float scaledStartY = scale * iMatrixs[Matrix.MTRANS_Y];
         float shiftY = toY - y * scale;
         tMatrixs[Matrix.MTRANS_Y] = scaledStartY + shiftY;
+    }
 
-        Matrix target = new Matrix();
-        target.setValues(tMatrixs);
+    @Override
+    public void initialize(int width, int height, int parentWidth, int parentHeight) {
 
-        set(start, target, duration);
+        set(iMatrixs[Matrix.MSCALE_X], tMatrixs[Matrix.MSCALE_X],
+                iMatrixs[Matrix.MTRANS_X], tMatrixs[Matrix.MTRANS_X],
+                iMatrixs[Matrix.MTRANS_Y], tMatrixs[Matrix.MTRANS_Y]);
+
+        super.initialize(width, height, parentWidth, parentHeight);
     }
 
 }
