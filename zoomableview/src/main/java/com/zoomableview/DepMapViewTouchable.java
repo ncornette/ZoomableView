@@ -97,9 +97,12 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         if (event.getAction() == MotionEvent.ACTION_UP) {
             Log.i(getClass().getSimpleName(), "Action_Up");
             if (!zooming() && moved) {
-                matrix.mapRect(rectMap, rectMapOrigin);
-                rectMapUpdate.set(rectMap);
 
+                // Put current map rect into rectMap
+                matrix.mapRect(rectMap, rectMapOrigin);
+
+                // Create copy of rectMap to hold transformation
+                rectMapUpdate.set(rectMap);
                 if (rectMap.width() < getWidth()) {
                     rectMapUpdate.offset(-rectMap.centerX() + rectView.centerX(), 0);
                 } else if (rectMap.left > 0) {
@@ -118,6 +121,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
 
                 if (!equalsRect(rectMapUpdate, rectMap)) {
                     Matrix matrix2 = new Matrix();
+                    // Create matrix for translation from current rect to new rect
                     matrix2.setRectToRect(rectMapOrigin, rectMapUpdate, ScaleToFit.FILL);
                     mapScaleAnim = new MapScaleAnim(matrix, matrix2, 200);
                     mapScaleAnim.initialize(0, 0, getWidth(), getHeight());
