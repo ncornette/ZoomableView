@@ -78,6 +78,8 @@ public class MapScaleAnim extends AnimationSet {
     @Override
     public void initialize(int width, int height, int parentWidth, int parentHeight) {
 
+        // TODO: Correct translation here, to avoid screen overflow
+
         set(iMatrixs[Matrix.MSCALE_X], tMatrixs[Matrix.MSCALE_X],
                 iMatrixs[Matrix.MTRANS_X], tMatrixs[Matrix.MTRANS_X],
                 iMatrixs[Matrix.MTRANS_Y], tMatrixs[Matrix.MTRANS_Y]);
