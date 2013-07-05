@@ -100,4 +100,22 @@ public class DepMapView extends View {
 
     }
 
+    /**
+     * 
+     * @return whether the left edge of the image view touches the left edge of its container
+     */
+    public boolean isFullLeft() {
+        // TODO
+        return false;
+    }
+
+    /**
+     * 
+     * @return whether the right edge of the image view touches the right edge of its container
+     */
+    public boolean isFullRight() {
+        // TODO
+        return true;
+    }
+
 }
