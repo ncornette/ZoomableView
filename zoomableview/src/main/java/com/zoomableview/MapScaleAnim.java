@@ -66,15 +66,16 @@ public class MapScaleAnim extends AnimationSet {
         tMatrixs[Matrix.MSCALE_X] = scale * iMatrixs[Matrix.MSCALE_X];
         tMatrixs[Matrix.MSCALE_Y] = scale * iMatrixs[Matrix.MSCALE_Y];
 
-        float scaledStartX = scale * iMatrixs[Matrix.MTRANS_X];
-        float shiftX = toX - x * scale;
-        tMatrixs[Matrix.MTRANS_X] = scaledStartX + shiftX;
-
-        float scaledStartY = scale * iMatrixs[Matrix.MTRANS_Y];
-        float shiftY = toY - y * scale;
-        tMatrixs[Matrix.MTRANS_Y] = scaledStartY + shiftY;
+        setTranslate(Matrix.MTRANS_X, x, toX, scale);
+        setTranslate(Matrix.MTRANS_Y, y, toY, scale);
     }
 
+    private void setTranslate(int direction, float from, float to, float scale) {
+        float scaledfrom = scale * iMatrixs[direction];
+        float shift = to - from * scale;
+        tMatrixs[direction] = scaledfrom + shift;
+	}
+    
     @Override
     public void initialize(int width, int height, int parentWidth, int parentHeight) {
 
