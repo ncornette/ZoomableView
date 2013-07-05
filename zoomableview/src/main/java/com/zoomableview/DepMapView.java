@@ -59,9 +59,20 @@ public class DepMapView extends View {
         requestLayout();
     }
 
+    /**
+     * Returns whether a map is set to this view
+     * 
+     * @return whether a map is set to this view
+     */
+    public boolean hasMap() {
+        return this.map != null;
+    }
+
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
+        if (map == null)
+            return;
         rectMapOrigin.set(0f, 0f, map.getWidth(), map.getHeight());
         rectView.set(0f, 0f, getWidth(), getHeight());
         matrixOrigin.setRectToRect(rectMapOrigin, rectView, ScaleToFit.CENTER);
@@ -77,7 +88,8 @@ public class DepMapView extends View {
         canvas.concat(matrix);
 
         // Draw full map
-        canvas.drawBitmap(map, 0, 0, mapPaint);
+        if (map != null)
+            canvas.drawBitmap(map, 0, 0, mapPaint);
 
         // // Debug clip Bounds
         // Paint clipPaint = new Paint();
