@@ -7,8 +7,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Matrix.ScaleToFit;
+import android.graphics.Paint.Style;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -18,6 +20,8 @@ import android.view.View;
  */
 public class DepMapView extends View {
 
+    protected static Boolean DEBUG = false;
+
     private Bitmap map;
     private Paint mapPaint;
     protected RectF rectMapOrigin = new RectF();
@@ -25,6 +29,7 @@ public class DepMapView extends View {
     protected Matrix matrixOrigin = new Matrix();
     protected Matrix matrix = new Matrix();
     protected Boolean scaling = null;
+    private Paint debugPaint;
 
     public DepMapView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -80,6 +85,7 @@ public class DepMapView extends View {
         if (matrix.isIdentity()) {
             matrix.set(matrixOrigin);
         }
+        if (DEBUG) debugPaint = new Paint();
     }
 
     @Override
@@ -92,13 +98,20 @@ public class DepMapView extends View {
         if (map != null)
             canvas.drawBitmap(map, 0, 0, mapPaint);
 
-        // // Debug clip Bounds
-        // Paint clipPaint = new Paint();
-        // clipPaint.setColor(Color.RED);
-        // clipPaint.setStyle(Style.STROKE);
-        // clipPaint.setStrokeWidth(5);
-        // canvas.drawRect(canvas.getClipBounds(), clipPaint);
-
+    }
+    
+    protected void debugRect(Canvas canvas, RectF rect, int c) {
+        debugPaint.setColor(c);
+        debugPaint.setStyle(Style.STROKE);
+        debugPaint.setStrokeWidth(5);
+        canvas.drawRect(rect, debugPaint);
+    }
+    
+    protected void debugRect(Canvas canvas, Rect rect, int c) {
+        debugPaint.setColor(c);
+        debugPaint.setStyle(Style.STROKE);
+        debugPaint.setStrokeWidth(5);
+        canvas.drawRect(rect, debugPaint);
     }
 
     /**

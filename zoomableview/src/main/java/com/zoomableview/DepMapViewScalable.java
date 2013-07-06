@@ -12,6 +12,7 @@ import android.view.animation.BounceInterpolator;
 @TargetApi(value = 8)
 public class DepMapViewScalable extends DepMapViewTouchable implements OnScaleGestureListener {
 
+    private static final String TAG = DepMapViewScalable.class.getSimpleName();
     private android.view.ScaleGestureDetector scaleDetector;
     private float[] matrixValues = new float[9];
     private float[] matrixOriginValues = new float[9];
@@ -66,6 +67,7 @@ public class DepMapViewScalable extends DepMapViewTouchable implements OnScaleGe
 
     @Override
     public boolean onScaleBegin(android.view.ScaleGestureDetector detector) {
+        if (DEBUG) Log.v(TAG, "Scale Begin");
         mapListener.onSingleTapCancelled();
         mapListener.onTouchScale(detector.getScaleFactor(),
                 detector.getFocusX(), detector.getFocusY());

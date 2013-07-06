@@ -2,6 +2,8 @@ package com.zoomableview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -41,10 +43,12 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     private static final OverScrollListener NULL_OVERSCROLL_LISTENER = new OverScrollListener() {
         @Override
         public void onOverscrollX(float f) {
+            if (DEBUG) Log.v(TAG, "OverScroll X: " + f);
         }
 
         @Override
         public void onOverscrollY(float f) {
+            if (DEBUG) Log.v(TAG, "OverScroll Y: " + f);
         }
     };
 
@@ -126,7 +130,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_UP) {
-            Log.i(getClass().getSimpleName(), "Action_Up");
+            if (DEBUG) Log.v(TAG, "Action_Up");
             if (!zooming() && moved) {
 
                 // Put current map rect into rectMap
@@ -227,7 +231,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
 
     @Override
     public boolean onDoubleTap(MotionEvent e) {
-        Log.i(getClass().getSimpleName(), "onDoubleTap");
+        if (DEBUG) Log.v(TAG, "onDoubleTap");
         // zoomToggle(e.getX(), e.getY());
         // Use Listener
         if (mapListener != null) {
@@ -238,7 +242,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
 
     @Override
     public boolean onDoubleTapEvent(MotionEvent e) {
-        Log.i(getClass().getSimpleName(), "onDoubleTapEvent");
+        if (DEBUG) Log.v(TAG, "onDoubleTapEvent");
         return false;
     }
 
@@ -267,7 +271,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
 
     @Override
     public boolean onDown(MotionEvent e) {
-        Log.i(getClass().getSimpleName(), "onDown");
+        if (DEBUG) Log.v(TAG, "onDown");
 
         // Use Listener
         if (mapListener != null) {
@@ -281,13 +285,13 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
             float velocityY) {
-        // Log.i(getClass().getSimpleName(), "onFling");
+        if (DEBUG) Log.v(TAG, "onFling");
         return false;
     }
 
     @Override
     public void onLongPress(MotionEvent e) {
-        // Log.i(getClass().getSimpleName(), "onLongPress");
+        if (DEBUG) Log.v(TAG, "onLongPress");
 
     }
 
@@ -302,8 +306,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
             float distanceY) {
-        // Log.i(getClass().getSimpleName(), String.format("onScroll : dist : %f, %f ", distanceX,
-        // distanceY));
+        // if (DEBUG) Log.v(TAG, String.format("onScroll : dist : %f, %f ", distanceX, distanceY));
         if (!zooming()) {
             matrix.mapRect(rectMap, rectMapOrigin);
 
@@ -336,7 +339,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
 
     @Override
     public void onShowPress(MotionEvent e) {
-        // Log.i(getClass().getSimpleName(), "onShowPress");
+        if (DEBUG) Log.v(TAG, "onShowPress");
     }
 
     @Override
@@ -346,5 +349,16 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
 
     public boolean isZoomed() {
         return zoomed;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+         if (DEBUG) {
+            // Debug Rects
+            debugRect(canvas, rectView, Color.BLUE);
+            debugRect(canvas, rectMapUpdate, Color.GREEN);
+            debugRect(canvas, rectMap, Color.RED);
+         }
+        super.onDraw(canvas);
     }
 }

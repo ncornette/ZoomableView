@@ -2,11 +2,14 @@ package com.zoomableview;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 
 import com.zoomableview.DepMapViewTouchable.TouchMapListener;
 
 public class HelloAndroidActivity extends Activity {
+
+    protected static final String TAG = HelloAndroidActivity.class.getSimpleName();
 
     /**
      * Called when the activity is first created.
@@ -24,18 +27,22 @@ public class HelloAndroidActivity extends Activity {
 
             @Override
             public void onTouchScale(float arg0, float arg1, float arg2) {
+                Log.v(TAG, "onTouchScale");
             }
 
             @Override
             public void onTouch(float arg0, float arg1) {
+                Log.v(TAG, "onTouch");
             }
 
             @Override
             public void onSingleTapConfirmed() {
+                Log.v(TAG, "onSingleTapConfirmed");
             }
 
             @Override
             public void onSingleTapCancelled() {
+                Log.v(TAG, "onSingleTapCancelled");
             }
 
             @Override
