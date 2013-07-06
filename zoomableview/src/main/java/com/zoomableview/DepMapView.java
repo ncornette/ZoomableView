@@ -26,6 +26,7 @@ public class DepMapView extends View {
     protected static final String TAG = DepMapView.class.getSimpleName();
 
     protected static Boolean DEBUG = false;
+    private Paint debugPaint;
 
     private Bitmap map;
     private Paint mapPaint;
@@ -34,13 +35,12 @@ public class DepMapView extends View {
     protected Matrix matrixOrigin = new Matrix();
     protected Matrix matrix = new Matrix();
     protected Boolean scaling = null;
-    private Paint debugPaint;
     private RectF tmpRect = new RectF();
 
-    protected boolean mAutoZoomFill;
-    protected float mAutoZoomLevel;
-    protected boolean mMaxZoomFill;
-    protected float mMaxZoomLevel;
+    private boolean mAutoZoomFill;
+    private float mAutoZoomLevel;
+    private boolean mMaxZoomFill;
+    private float mMaxZoomLevel;
 
     private Transformation transform;
     protected boolean zoomed;
