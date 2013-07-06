@@ -8,7 +8,6 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.Matrix.ScaleToFit;
-import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -16,7 +15,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.GestureDetector.OnGestureListener;
-import android.view.animation.Transformation;
 
 public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListener, OnGestureListener {
 
@@ -52,12 +50,11 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         }
     };
 
-    private Transformation transform;
-    protected boolean zoomed;
-    protected MapScaleAnim mapScaleAnim;
     private GestureDetector gestureScanner;
     protected TouchMapListener mapListener;
-    private RectF tmpRect = new RectF();
+    private boolean moved;
+    private RectF rectMap = new RectF();
+    private RectF rectMapUpdate = new RectF();
 
     public static interface TouchMapListener {
 
@@ -74,15 +71,10 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
 
     public DepMapViewTouchable(Context context, AttributeSet attrs) {
         super(context, attrs);
-        transform = new Transformation();
         gestureScanner = new GestureDetector(getContext(), this);
         gestureScanner.setOnDoubleTapListener(this);
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_DepMapView);
-        mAutoZoomFill = a.getBoolean(R.styleable.com_zoomableview_DepMapView_autoZoomFill, false);
-        mAutoZoomLevel = a.getFloat(R.styleable.com_zoomableview_DepMapView_autoZoomLevel, 2f);
-        mMaxZoomFill = a.getBoolean(R.styleable.com_zoomableview_DepMapView_maxZoomFill, false);
-        mMaxZoomLevel = a.getFloat(R.styleable.com_zoomableview_DepMapView_maxZoomLevel, 3f);
         a.recycle();
     }
 
@@ -90,30 +82,6 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         this.mapListener = mapListener;
     }
 
-    Handler mapZoomHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (!mapScaleAnim.hasEnded()) {
-                this.sendEmptyMessageDelayed(0, 40);
-                mapScaleAnim.getTransformation(System.currentTimeMillis(), transform);
-                matrix.set(transform.getMatrix());
-                invalidate();
-            } else {
-                updateDiffRect();
-                if (DEBUG) {
-                    Log.v(TAG, "Animation End");
-                    invalidate();
-                }
-            }
-        }
-    };
-    private RectF rectMap = new RectF();
-    private RectF rectMapUpdate = new RectF();
-    private boolean moved;
-    private boolean mAutoZoomFill;
-    private float mAutoZoomLevel;
-    private boolean mMaxZoomFill;
-    private float mMaxZoomLevel;
     private OverScrollListener mOverScrollListener = NULL_OVERSCROLL_LISTENER;
 
     private Matrix matrixTranslate = new Matrix();
@@ -163,79 +131,11 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
                     mapScaleAnim = new MapScaleAnim(matrix, matrixTranslate, 200);
                     mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
                     mapScaleAnim.start();
-                    mapZoomHandler.handleMessage(null);
+                    Message.obtain(mapZoomHandler, 0).sendToTarget();
                 }
             }
         }
         return gestureScanner.onTouchEvent(event);
-    }
-
-    protected void updateDiffRect() {
-        // Put current map rect into rectMap
-        matrix.mapRect(rectMap, rectMapOrigin);
-        // Create copy of rectMap to hold transformation
-        rectMapUpdate.set(rectMap);
-    }
-
-    public void zoomOnScreen(float x, float y) {
-        mapScaleAnim = new MapScaleAnim(matrixOrigin, x, y, getWidth() / 2, getHeight() / 2, getAutoZoomLevel(), 500);
-        mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
-        mapScaleAnim.start();
-        mapZoomHandler.handleMessage(null);
-        zoomed = true;
-    }
-
-    public void zoomOut() {
-        zoomOut(500);
-    }
-
-    public void zoomOut(int duration) {
-        mapScaleAnim = new MapScaleAnim(matrix, matrixOrigin, duration);
-        mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
-        mapScaleAnim.start();
-        mapZoomHandler.handleMessage(null);
-        zoomed = false;
-    }
-
-    /**
-     * Switch to ZoomIn or ZoomOut
-     * 
-     * @param onX
-     * @param onY
-     */
-    public void zoomToggle(float onX, float onY) {
-        if (!zoomed) {
-            zoomOnScreen(onX, onY);
-        } else {
-            zoomOut();
-        }
-    }
-
-    private float getFillBorderZoomLevel() {
-        matrixOrigin.mapRect(tmpRect, rectMapOrigin);
-        return rectView.width() / tmpRect.width() * rectView.height() / tmpRect.height();
-    }
-
-    /**
-     * @return zoom level for auto zoom request or Max zoom allowed.
-     */
-    protected float getAutoZoomLevel() {
-        if (mAutoZoomFill) {
-            return Math.min(getMaxZoomLevel(), getFillBorderZoomLevel());
-        } else {
-            return mAutoZoomLevel;
-        }
-    }
-
-    /**
-     * @return max allowed zoom level.
-     */
-    protected float getMaxZoomLevel() {
-        if (mMaxZoomFill) {
-            return getFillBorderZoomLevel();
-        } else {
-            return mMaxZoomLevel;
-        }
     }
 
     @Override
@@ -266,7 +166,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
             }
             mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
             mapScaleAnim.start();
-            mapZoomHandler.handleMessage(null);
+            Message.obtain(mapZoomHandler, 0).sendToTarget();
         }
     }
 
@@ -290,6 +190,19 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
 
         moved = false;
         return true;
+    }
+
+    protected void updateDiffRect() {
+        // Put current map rect into rectMap
+        matrix.mapRect(rectMap, rectMapOrigin);
+        // Create copy of rectMap to hold transformation
+        rectMapUpdate.set(rectMap);
+    }
+
+    @Override
+    protected void onAnimationEnd() {
+        super.onAnimationEnd();
+        updateDiffRect();
     }
 
     @Override
@@ -344,7 +257,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     }
 
     boolean zooming() {
-        return mapZoomHandler.hasMessages(0);
+        return mapZoomHandler.hasMessages(1);
     }
 
     @Override
@@ -366,8 +279,8 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
          if (DEBUG) {
             // Debug Rects
             debugRect(canvas, rectView, Color.BLUE);
-            debugRect(canvas, rectMapUpdate, Color.GREEN);
             debugRect(canvas, rectMap, Color.RED);
+            debugRect(canvas, rectMapUpdate, Color.GREEN);
          }
         super.onDraw(canvas);
     }

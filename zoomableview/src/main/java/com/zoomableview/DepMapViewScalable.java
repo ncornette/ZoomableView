@@ -3,6 +3,7 @@ package com.zoomableview;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Matrix;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -96,7 +97,7 @@ public class DepMapViewScalable extends DepMapViewTouchable implements OnScaleGe
         mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
         mapScaleAnim.setInterpolator(new BounceInterpolator());
         mapScaleAnim.start();
-        mapZoomHandler.handleMessage(null);
+        Message.obtain(mapZoomHandler, 0).sendToTarget();
     }
 
 }

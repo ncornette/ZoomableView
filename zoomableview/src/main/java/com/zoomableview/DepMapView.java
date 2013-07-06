@@ -11,14 +11,19 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Matrix.ScaleToFit;
 import android.graphics.Paint.Style;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
+import android.view.animation.Transformation;
 
 /**
- * @author nic A View that draws a Map and can show departments on top of it, the department can
- *         blink and the related region can be displayed. Department capitals can be displayed too.
+ * 
  */
 public class DepMapView extends View {
+
+    protected static final String TAG = DepMapView.class.getSimpleName();
 
     protected static Boolean DEBUG = false;
 
@@ -30,11 +35,43 @@ public class DepMapView extends View {
     protected Matrix matrix = new Matrix();
     protected Boolean scaling = null;
     private Paint debugPaint;
+    private RectF tmpRect = new RectF();
+
+    protected boolean mAutoZoomFill;
+    protected float mAutoZoomLevel;
+    protected boolean mMaxZoomFill;
+    protected float mMaxZoomLevel;
+
+    private Transformation transform;
+    protected boolean zoomed;
+    protected MapScaleAnim mapScaleAnim;
+
+    Handler mapZoomHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 0) {
+                onAnimationStart();
+            }
+            if (!mapScaleAnim.hasEnded()) {
+                this.sendEmptyMessageDelayed(1, 40);
+                mapScaleAnim.getTransformation(System.currentTimeMillis(), transform);
+                matrix.set(transform.getMatrix());
+                invalidate();
+            } else {
+                onAnimationEnd();
+                if (DEBUG) {
+                    Log.v(TAG, "Animation End");
+                    invalidate();
+                }
+            }
+        }
+    };
 
     public DepMapView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mapPaint = new Paint();
         mapPaint.setFilterBitmap(true);
+        transform = new Transformation();
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_DepMapView);
         int resourceId = a.getResourceId(R.styleable.com_zoomableview_DepMapView_mapref, 0);
@@ -42,6 +79,10 @@ public class DepMapView extends View {
 
         if (resourceId != 0) {
             map = BitmapFactory.decodeResource(getResources(), resourceId);
+            mAutoZoomFill = a.getBoolean(R.styleable.com_zoomableview_DepMapView_autoZoomFill, false);
+            mAutoZoomLevel = a.getFloat(R.styleable.com_zoomableview_DepMapView_autoZoomLevel, 2f);
+            mMaxZoomFill = a.getBoolean(R.styleable.com_zoomableview_DepMapView_maxZoomFill, false);
+            mMaxZoomLevel = a.getFloat(R.styleable.com_zoomableview_DepMapView_maxZoomLevel, 3f);
         }
     }
 
@@ -72,6 +113,67 @@ public class DepMapView extends View {
      */
     public boolean hasMap() {
         return this.map != null;
+    }
+
+    public void zoomOnScreen(float x, float y) {
+        mapScaleAnim = new MapScaleAnim(matrixOrigin, x, y, getWidth() / 2, getHeight() / 2, getAutoZoomLevel(), 500);
+        mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
+        mapScaleAnim.start();
+        Message.obtain(mapZoomHandler, 0).sendToTarget();
+        zoomed = true;
+    }
+
+    public void zoomOut() {
+        zoomOut(500);
+    }
+
+    public void zoomOut(int duration) {
+        mapScaleAnim = new MapScaleAnim(matrix, matrixOrigin, duration);
+        mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
+        mapScaleAnim.start();
+        Message.obtain(mapZoomHandler, 0).sendToTarget();
+        zoomed = false;
+    }
+
+    /**
+     * Switch to ZoomIn or ZoomOut
+     * 
+     * @param onX
+     * @param onY
+     */
+    public void zoomToggle(float onX, float onY) {
+        if (!zoomed) {
+            zoomOnScreen(onX, onY);
+        } else {
+            zoomOut();
+        }
+    }
+
+    private float getFillBorderZoomLevel() {
+        matrixOrigin.mapRect(tmpRect, rectMapOrigin);
+        return rectView.width() / tmpRect.width() * rectView.height() / tmpRect.height();
+    }
+
+    /**
+     * @return zoom level for auto zoom request or Max zoom allowed.
+     */
+    protected float getAutoZoomLevel() {
+        if (mAutoZoomFill) {
+            return Math.min(getMaxZoomLevel(), getFillBorderZoomLevel());
+        } else {
+            return mAutoZoomLevel;
+        }
+    }
+
+    /**
+     * @return max allowed zoom level.
+     */
+    protected float getMaxZoomLevel() {
+        if (mMaxZoomFill) {
+            return getFillBorderZoomLevel();
+        } else {
+            return mMaxZoomLevel;
+        }
     }
 
     @Override
