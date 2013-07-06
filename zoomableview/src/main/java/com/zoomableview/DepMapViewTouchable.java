@@ -3,20 +3,50 @@ package com.zoomableview;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Matrix;
-import android.graphics.Matrix.ScaleToFit;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.graphics.Matrix.ScaleToFit;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.GestureDetector.OnGestureListener;
-import android.view.MotionEvent;
 import android.view.animation.Transformation;
 
 public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListener, OnGestureListener {
+
+    private static final String TAG = DepMapViewTouchable.class.getSimpleName();
+
+    public interface OverScrollListener {
+
+        /**
+         * Overscroll in the X axis in pixels
+         * can be positive or negative depending on the direction
+         * @param f
+         */
+        void onOverscrollX(float overScrollX);
+
+        /**
+         * Overscroll in the Y axis in pixels
+         * can be positive or negative depending on the direction
+         * @param f
+         */
+        void onOverscrollY(float overScrollY);
+
+    }
+
+    private static final OverScrollListener NULL_OVERSCROLL_LISTENER = new OverScrollListener() {
+        @Override
+        public void onOverscrollX(float f) {
+        }
+
+        @Override
+        public void onOverscrollY(float f) {
+        }
+    };
 
     private Transformation transform;
     protected boolean zoomed;
@@ -74,6 +104,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     private float mAutoZoomLevel;
     private boolean mMaxZoomFill;
     private float mMaxZoomLevel;
+    private OverScrollListener mOverScrollListener = NULL_OVERSCROLL_LISTENER;
 
     public static float distance(PointF p, PointF q)
     {
@@ -260,6 +291,14 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
 
     }
 
+    public void setOverScrollListener(OverScrollListener listener) {
+        if (mOverScrollListener == null) {
+            mOverScrollListener = NULL_OVERSCROLL_LISTENER;
+        } else {
+            mOverScrollListener = listener;
+        }
+    }
+
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
             float distanceY) {
@@ -268,14 +307,20 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         if (!zooming()) {
             matrix.mapRect(rectMap, rectMapOrigin);
 
-            if ((rectView.right > rectMap.right && distanceX > 0) ||
-                    (rectView.left < rectMap.left && distanceX < 0)) {
+            if (rectView.right > rectMap.right && distanceX > 0) {
                 distanceX *= 0.3f;
+                mOverScrollListener.onOverscrollX(rectMap.right - getWidth());
+            } else if (rectView.left < rectMap.left && distanceX < 0) {
+                distanceX *= 0.3f;
+                mOverScrollListener.onOverscrollX(rectMap.left);
             }
 
-            if ((rectView.bottom > rectMap.bottom && distanceY > 0) ||
-                    (rectView.top < rectMap.top && distanceY < 0)) {
+            if (rectView.bottom > rectMap.bottom && distanceY > 0) {
                 distanceY *= 0.3f;
+                mOverScrollListener.onOverscrollY(rectMap.bottom - getHeight());
+            } else if (rectView.top < rectMap.top && distanceY < 0) {
+                distanceY *= 0.3f;
+                mOverScrollListener.onOverscrollY(rectMap.top);
             }
 
             moved = true;

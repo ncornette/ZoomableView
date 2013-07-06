@@ -15,7 +15,6 @@ public class DepMapViewScalable extends DepMapViewTouchable implements OnScaleGe
     private android.view.ScaleGestureDetector scaleDetector;
     private float[] matrixValues = new float[9];
     private float[] matrixOriginValues = new float[9];
-    protected Boolean scaling = null;
     Matrix savedMatrix = new Matrix();
 
     public DepMapViewScalable(Context context, AttributeSet attrs) {

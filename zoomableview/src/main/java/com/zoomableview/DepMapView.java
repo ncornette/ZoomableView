@@ -6,9 +6,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Matrix.ScaleToFit;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.Matrix.ScaleToFit;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -24,6 +24,7 @@ public class DepMapView extends View {
     protected RectF rectView = new RectF();
     protected Matrix matrixOrigin = new Matrix();
     protected Matrix matrix = new Matrix();
+    protected Boolean scaling = null;
 
     public DepMapView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -103,7 +104,9 @@ public class DepMapView extends View {
     /**
      * 
      * @return whether the left edge of the image view touches the left edge of its container
+     * @deprecated use {@link DepMapViewTouchable#setOverScrollListener(com.zoomableview.DepMapViewTouchable.OverScrollListener)} instead
      */
+    @Deprecated
     public boolean isFullLeft() {
         // TODO
         return false;
@@ -112,7 +115,9 @@ public class DepMapView extends View {
     /**
      * 
      * @return whether the right edge of the image view touches the right edge of its container
+     * @deprecated use {@link DepMapViewTouchable#setOverScrollListener(com.zoomableview.DepMapViewTouchable.OverScrollListener)} instead
      */
+    @Deprecated
     public boolean isFullRight() {
         // TODO
         return true;
