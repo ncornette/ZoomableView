@@ -50,41 +50,88 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         }
     };
 
-    private GestureDetector gestureScanner;
-    protected TouchMapListener mapListener;
-    private boolean moved;
-    private RectF rectMap = new RectF();
-    private RectF rectMapUpdate = new RectF();
-
     public static interface TouchMapListener {
-
+    
         void onDoubleTap(float eventX, float eventY);
-
+    
         void onTouchScale(float scaleFactor, float foxusX, float focusY);
-
+    
         void onSingleTapConfirmed();
-
+    
         void onTouch(float x, float y);
-
+    
         void onSingleTapCancelled();
     }
 
+    private static final TouchMapListener NULL_TOUCHMAP_LISTENER = new TouchMapListener() {
+
+        @Override
+        public void onTouchScale(float scaleFactor, float foxusX, float focusY) {
+        }
+
+        @Override
+        public void onTouch(float x, float y) {
+        }
+
+        @Override
+        public void onSingleTapConfirmed() {
+        }
+
+        @Override
+        public void onSingleTapCancelled() {
+        }
+
+        @Override
+        public void onDoubleTap(float eventX, float eventY) {
+        }
+    };
+
+    private GestureDetector gestureScanner;
+    protected TouchMapListener mapListener = NULL_TOUCHMAP_LISTENER;
+    private OverScrollListener mOverScrollListener = NULL_OVERSCROLL_LISTENER;
+    private boolean moved;
+    private RectF rectMap = new RectF();
+    private RectF rectMapUpdate = new RectF();
+    private boolean mDoubleTapZoom;
+    private Matrix matrixTranslate = new Matrix();
+
+
+    public DepMapViewTouchable(Context context) {
+        this(context, null);
+    }
+
     public DepMapViewTouchable(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
+    }
+
+    public DepMapViewTouchable(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
         gestureScanner = new GestureDetector(getContext(), this);
         gestureScanner.setOnDoubleTapListener(this);
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_DepMapView);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_DepMapView, defStyle, 0);
+
+        mDoubleTapZoom = a.getBoolean(R.styleable.com_zoomableview_DepMapView_doubletabZoom, true);
+
         a.recycle();
     }
 
-    public void setTouchMapListener(TouchMapListener mapListener) {
-        this.mapListener = mapListener;
+    public void setOverScrollListener(OverScrollListener listener) {
+        if (mOverScrollListener == null) {
+            mOverScrollListener = NULL_OVERSCROLL_LISTENER;
+        } else {
+            mOverScrollListener = listener;
+        }
     }
 
-    private OverScrollListener mOverScrollListener = NULL_OVERSCROLL_LISTENER;
+    public void setTouchMapListener(TouchMapListener mapListener) {
+        if (mapListener == null) {
+            this.mapListener = NULL_TOUCHMAP_LISTENER;
+        } else {
+            this.mapListener = mapListener;
+        }
+    }
 
-    private Matrix matrixTranslate = new Matrix();
 
     public static float distance(PointF p, PointF q)
     {
@@ -108,6 +155,8 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         if (event.getAction() == MotionEvent.ACTION_UP) {
             if (DEBUG) Log.v(TAG, "Action_Up");
             if (!zooming() && moved) {
+
+                // Will start animation for the image to return in its bounds
                 updateDiffRect();
                 if (rectMap.width() < getWidth()) {
                     rectMapUpdate.offset(-rectMap.centerX() + rectView.centerX(), 0);
@@ -171,18 +220,13 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     public boolean onSingleTapConfirmed(MotionEvent e) {
         Log.i(getClass().getSimpleName(), "onSingleTapConfirmed");
         mapListener.onSingleTapConfirmed();
-        // centerOnCurrentDep();
         return false;
     }
 
     @Override
     public boolean onDown(MotionEvent e) {
         if (DEBUG) Log.v(TAG, "onDown");
-
-        // Use Listener
-        if (mapListener != null) {
-            mapListener.onTouch(e.getX(), e.getY());
-        }
+        mapListener.onTouch(e.getX(), e.getY());
         updateDiffRect();
 
         moved = false;
@@ -213,14 +257,6 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     public void onLongPress(MotionEvent e) {
         if (DEBUG) Log.v(TAG, "onLongPress");
 
-    }
-
-    public void setOverScrollListener(OverScrollListener listener) {
-        if (mOverScrollListener == null) {
-            mOverScrollListener = NULL_OVERSCROLL_LISTENER;
-        } else {
-            mOverScrollListener = listener;
-        }
     }
 
     @Override

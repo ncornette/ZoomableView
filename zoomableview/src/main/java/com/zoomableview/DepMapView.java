@@ -67,23 +67,34 @@ public class DepMapView extends View {
         }
     };
 
+    public DepMapView(Context context) {
+        this(context, null);
+    }
+
     public DepMapView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
+    }
+
+    public DepMapView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
         mapPaint = new Paint();
         mapPaint.setFilterBitmap(true);
         transform = new Transformation();
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_DepMapView);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_DepMapView, defStyle, 0);
         int resourceId = a.getResourceId(R.styleable.com_zoomableview_DepMapView_mapref, 0);
         a.recycle();
 
         if (resourceId != 0) {
             map = BitmapFactory.decodeResource(getResources(), resourceId);
-            mAutoZoomFill = a.getBoolean(R.styleable.com_zoomableview_DepMapView_autoZoomFill, false);
-            mAutoZoomLevel = a.getFloat(R.styleable.com_zoomableview_DepMapView_autoZoomLevel, 2f);
-            mMaxZoomFill = a.getBoolean(R.styleable.com_zoomableview_DepMapView_maxZoomFill, false);
-            mMaxZoomLevel = a.getFloat(R.styleable.com_zoomableview_DepMapView_maxZoomLevel, 3f);
         }
+
+        mAutoZoomLevel = a.getFloat(R.styleable.com_zoomableview_DepMapView_autoZoomLevel, 2f);
+        mAutoZoomFill = a.getBoolean(R.styleable.com_zoomableview_DepMapView_autoZoomFill, mAutoZoomLevel < 0);
+
+        mMaxZoomLevel = a.getFloat(R.styleable.com_zoomableview_DepMapView_maxZoomLevel, 3f);
+        mMaxZoomFill = a.getBoolean(R.styleable.com_zoomableview_DepMapView_maxZoomFill, mMaxZoomLevel < 0);
+
     }
 
     /**
