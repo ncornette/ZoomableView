@@ -78,8 +78,8 @@ public class DepMapViewScalable extends DepMapViewTouchable implements OnScaleGe
 
     @Override
     public void onScaleEnd(android.view.ScaleGestureDetector detector) {
-        Log.i(getClass().getSimpleName(), "Scale End");
-
+        if (DEBUG) Log.v(TAG, "Scale End");
+        updateDiffRect();
         matrix.getValues(matrixValues);
         scaling = false;
 

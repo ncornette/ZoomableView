@@ -98,6 +98,12 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
                 mapScaleAnim.getTransformation(System.currentTimeMillis(), transform);
                 matrix.set(transform.getMatrix());
                 invalidate();
+            } else {
+                updateDiffRect();
+                if (DEBUG) {
+                    Log.v(TAG, "Animation End");
+                    invalidate();
+                }
             }
         }
     };
@@ -109,6 +115,8 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     private boolean mMaxZoomFill;
     private float mMaxZoomLevel;
     private OverScrollListener mOverScrollListener = NULL_OVERSCROLL_LISTENER;
+
+    private Matrix matrixTranslate = new Matrix();
 
     public static float distance(PointF p, PointF q)
     {
@@ -132,12 +140,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         if (event.getAction() == MotionEvent.ACTION_UP) {
             if (DEBUG) Log.v(TAG, "Action_Up");
             if (!zooming() && moved) {
-
-                // Put current map rect into rectMap
-                matrix.mapRect(rectMap, rectMapOrigin);
-
-                // Create copy of rectMap to hold transformation
-                rectMapUpdate.set(rectMap);
+                updateDiffRect();
                 if (rectMap.width() < getWidth()) {
                     rectMapUpdate.offset(-rectMap.centerX() + rectView.centerX(), 0);
                 } else if (rectMap.left > 0) {
@@ -155,10 +158,9 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
                 }
 
                 if (!equalsRect(rectMapUpdate, rectMap)) {
-                    Matrix matrix2 = new Matrix();
                     // Create matrix for translation from current rect to new rect
-                    matrix2.setRectToRect(rectMapOrigin, rectMapUpdate, ScaleToFit.FILL);
-                    mapScaleAnim = new MapScaleAnim(matrix, matrix2, 200);
+                    matrixTranslate.setRectToRect(rectMapOrigin, rectMapUpdate, ScaleToFit.FILL);
+                    mapScaleAnim = new MapScaleAnim(matrix, matrixTranslate, 200);
                     mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
                     mapScaleAnim.start();
                     mapZoomHandler.handleMessage(null);
@@ -166,6 +168,13 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
             }
         }
         return gestureScanner.onTouchEvent(event);
+    }
+
+    protected void updateDiffRect() {
+        // Put current map rect into rectMap
+        matrix.mapRect(rectMap, rectMapOrigin);
+        // Create copy of rectMap to hold transformation
+        rectMapUpdate.set(rectMap);
     }
 
     public void zoomOnScreen(float x, float y) {
@@ -277,6 +286,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         if (mapListener != null) {
             mapListener.onTouch(e.getX(), e.getY());
         }
+        updateDiffRect();
 
         moved = false;
         return true;
@@ -312,18 +322,18 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
 
             if (rectView.right > rectMap.right && distanceX > 0) {
                 distanceX *= 0.3f;
-                mOverScrollListener.onOverscrollX(rectMap.right - getWidth());
+                mOverScrollListener.onOverscrollX(rectMap.right - Math.min(rectMapUpdate.right, rectView.right));
             } else if (rectView.left < rectMap.left && distanceX < 0) {
                 distanceX *= 0.3f;
-                mOverScrollListener.onOverscrollX(rectMap.left);
+                mOverScrollListener.onOverscrollX(rectMap.left - Math.max(rectMapUpdate.left, rectView.left));
             }
 
             if (rectView.bottom > rectMap.bottom && distanceY > 0) {
                 distanceY *= 0.3f;
-                mOverScrollListener.onOverscrollY(rectMap.bottom - getHeight());
+                mOverScrollListener.onOverscrollY(rectMap.bottom - Math.min(rectMapUpdate.bottom, rectView.bottom));
             } else if (rectView.top < rectMap.top && distanceY < 0) {
                 distanceY *= 0.3f;
-                mOverScrollListener.onOverscrollY(rectMap.top);
+                mOverScrollListener.onOverscrollY(rectMap.top - Math.max(rectMapUpdate.top, rectView.top));
             }
 
             moved = true;
