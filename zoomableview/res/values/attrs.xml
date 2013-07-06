@@ -9,6 +9,8 @@
 
         <attr name="maxZoomFill" format="boolean" />
         <attr name="maxZoomLevel" format="float" />
+
+        <attr name="doubletabZoom" format="boolean" />
     </declare-styleable>
 
 </resources>
