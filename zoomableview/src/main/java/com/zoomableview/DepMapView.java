@@ -6,14 +6,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Matrix.ScaleToFit;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Matrix.ScaleToFit;
-import android.graphics.Paint.Style;
 import android.os.Handler;
-import android.os.Message;
 import android.os.Handler.Callback;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -57,7 +57,7 @@ public class DepMapView extends View implements Callback {
             onAnimationStart();
         }
         if (!mapScaleAnim.hasEnded()) {
-            msg.getTarget().sendEmptyMessageDelayed(1, 40);
+            msg.getTarget().sendEmptyMessage(1);
             mapScaleAnim.getTransformation(System.currentTimeMillis(), transform);
             matrix.set(transform.getMatrix());
             invalidate();
