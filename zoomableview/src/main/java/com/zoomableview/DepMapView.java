@@ -92,7 +92,7 @@ public class DepMapView extends View implements Callback {
         a.recycle();
 
         if (resourceId != 0) {
-            map = BitmapFactory.decodeResource(getResources(), resourceId);
+            setMap(resourceId);
         }
 
         mAutoZoomLevel = a.getFloat(R.styleable.com_zoomableview_DepMapView_autoZoomLevel, 2f);
@@ -110,8 +110,7 @@ public class DepMapView extends View implements Callback {
      * @param resId id of a drawable
      */
     public void setMap(int resId) {
-        this.map = BitmapFactory.decodeResource(getResources(), resId);
-        requestLayout();
+        setMap(BitmapFactory.decodeResource(getResources(), resId));
     }
 
     /**
@@ -121,6 +120,7 @@ public class DepMapView extends View implements Callback {
      */
     public void setMap(Bitmap bmp) {
         this.map = bmp;
+        rectMapOrigin.set(0f, 0f, map.getWidth(), map.getHeight());
         requestLayout();
     }
 
@@ -220,20 +220,48 @@ public class DepMapView extends View implements Callback {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
+        if (DEBUG) Log.v(TAG, "onLayout. changed:"+ changed);
         if (map == null)
             return;
-        rectMapOrigin.set(0f, 0f, map.getWidth(), map.getHeight());
-        rectView.set(0f, 0f, getWidth(), getHeight());
-        matrixOrigin.setRectToRect(rectMapOrigin, rectView, ScaleToFit.CENTER);
-        matrixOrigin.getValues(matrixOriginValues);
-        if (matrix.isIdentity()) {
-            matrix.set(matrixOrigin);
+        // Save previous view Rect
+        tmpRect.set(rectView);
+        rectView.set(0f, 0f, right - left, bottom - top);
+        resetOrigin();
+        if (matrix.isIdentity() || tmpRect.isEmpty()) {
+            resetPosition();
+        } else {
+            // Keep scale & adjust position after screen rotation
+            matrix.getValues(matrixValues);
+            matrixValues[Matrix.MTRANS_X] += (rectView.width() - tmpRect.width()) / 2;
+            matrixValues[Matrix.MTRANS_Y] += (rectView.height() - tmpRect.height()) / 2;
+            matrix.setValues(matrixValues);
+            zoomed = zoomed || changed;
         }
+    }
+
+    private void reset() {
+        resetOrigin();
+        resetPosition();
+    }
+
+    private void resetOrigin() {
+        if (rectView.isEmpty()) {
+            matrixOrigin.reset();
+        } else {
+            matrixOrigin.setRectToRect(rectMapOrigin, rectView, ScaleToFit.CENTER);
+            matrixOrigin.getValues(matrixOriginValues);
+        }
+    }
+
+    public void resetPosition() {
+        matrix.set(matrixOrigin);
+        zoomed = false;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        if (DEBUG) Log.v(TAG, "onDraw.");
 
         canvas.concat(matrix);
 

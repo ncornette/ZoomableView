@@ -155,36 +155,39 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         if (event.getAction() == MotionEvent.ACTION_UP) {
             if (DEBUG) Log.v(TAG, "Action_Up");
             if (!zooming() && moved) {
-
-                // Will start animation for the image to return in its bounds
-                updateDiffRect();
-                if (rectMap.width() < getWidth()) {
-                    rectMapUpdate.offset(-rectMap.centerX() + rectView.centerX(), 0);
-                } else if (rectMap.left > 0) {
-                    rectMapUpdate.offset(-rectMap.left, 0);
-                } else if (rectMap.right < getWidth()) {
-                    rectMapUpdate.offset(getWidth() - rectMap.right, 0);
-                }
-
-                if (rectMap.height() < getHeight()) {
-                    rectMapUpdate.offset(0, -rectMap.centerY() + rectView.centerY());
-                } else if (rectMap.top > 0) {
-                    rectMapUpdate.offset(0, -rectMap.top);
-                } else if (rectMap.bottom < getHeight()) {
-                    rectMapUpdate.offset(0, getHeight() - rectMap.bottom);
-                }
-
-                if (!equalsRect(rectMapUpdate, rectMap)) {
-                    // Create matrix for translation from current rect to new rect
-                    matrixTranslate.setRectToRect(rectMapOrigin, rectMapUpdate, ScaleToFit.FILL);
-                    mapScaleAnim = new MapScaleAnim(matrix, matrixTranslate, 200);
-                    mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
-                    mapScaleAnim.start();
-                    Message.obtain(mapZoomHandler, 0).sendToTarget();
-                }
+                translateTargetPosition();
             }
         }
         return gestureScanner.onTouchEvent(event);
+    }
+
+    private void translateTargetPosition() {
+        // Will start animation for the image to return in its bounds
+        updateDiffRect();
+        if (rectMap.width() < getWidth()) {
+            rectMapUpdate.offset(-rectMap.centerX() + rectView.centerX(), 0);
+        } else if (rectMap.left > 0) {
+            rectMapUpdate.offset(-rectMap.left, 0);
+        } else if (rectMap.right < getWidth()) {
+            rectMapUpdate.offset(getWidth() - rectMap.right, 0);
+        }
+
+        if (rectMap.height() < getHeight()) {
+            rectMapUpdate.offset(0, -rectMap.centerY() + rectView.centerY());
+        } else if (rectMap.top > 0) {
+            rectMapUpdate.offset(0, -rectMap.top);
+        } else if (rectMap.bottom < getHeight()) {
+            rectMapUpdate.offset(0, getHeight() - rectMap.bottom);
+        }
+
+        if (!equalsRect(rectMapUpdate, rectMap)) {
+            // Create matrix for translation from current rect to new rect
+            matrixTranslate.setRectToRect(rectMapOrigin, rectMapUpdate, ScaleToFit.FILL);
+            mapScaleAnim = new MapScaleAnim(matrix, matrixTranslate, 200);
+            mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
+            mapScaleAnim.start();
+            Message.obtain(mapZoomHandler, 0).sendToTarget();
+        }
     }
 
     @Override
@@ -250,6 +253,9 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
             float velocityY) {
         if (DEBUG) Log.v(TAG, "onFling");
+        if (!zooming()) {
+            // TODO: implement fling here
+        }
         return false;
     }
 
