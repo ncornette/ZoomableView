@@ -228,7 +228,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         if (DEBUG) Log.v(TAG, "onDown");
         mapListener.onTouch(e.getX(), e.getY());
         updateDiffRect();
-
+        mapZoomHandler.removeMessages(1);
         moved = false;
         return true;
     }

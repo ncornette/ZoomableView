@@ -13,6 +13,7 @@ import android.graphics.Matrix.ScaleToFit;
 import android.graphics.Paint.Style;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Handler.Callback;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -21,7 +22,7 @@ import android.view.animation.Transformation;
 /**
  * 
  */
-public class DepMapView extends View {
+public class DepMapView extends View implements Callback {
 
     protected static final String TAG = DepMapView.class.getSimpleName();
 
@@ -36,6 +37,8 @@ public class DepMapView extends View {
     protected Matrix matrix = new Matrix();
     protected Boolean scaling = null;
     private RectF tmpRect = new RectF();
+    private float[] matrixOriginValues = new float[9];
+    private float[] matrixValues = new float[9];
 
     private boolean mAutoZoomFill;
     private float mAutoZoomLevel;
@@ -46,26 +49,29 @@ public class DepMapView extends View {
     protected boolean zoomed;
     protected MapScaleAnim mapScaleAnim;
 
-    Handler mapZoomHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == 0) {
-                onAnimationStart();
-            }
-            if (!mapScaleAnim.hasEnded()) {
-                this.sendEmptyMessageDelayed(1, 40);
-                mapScaleAnim.getTransformation(System.currentTimeMillis(), transform);
-                matrix.set(transform.getMatrix());
+    @Override
+    public boolean handleMessage(Message msg) {
+        if (msg.what == 0) {
+            if (DEBUG) Log.v(TAG, "Animation Start");
+            msg.getTarget().removeMessages(1);
+            onAnimationStart();
+        }
+        if (!mapScaleAnim.hasEnded()) {
+            msg.getTarget().sendEmptyMessageDelayed(1, 40);
+            mapScaleAnim.getTransformation(System.currentTimeMillis(), transform);
+            matrix.set(transform.getMatrix());
+            invalidate();
+        } else {
+            onAnimationEnd();
+            if (DEBUG) {
+                Log.v(TAG, "Animation End");
                 invalidate();
-            } else {
-                onAnimationEnd();
-                if (DEBUG) {
-                    Log.v(TAG, "Animation End");
-                    invalidate();
-                }
             }
         }
-    };
+        return true;
+    }
+
+    Handler mapZoomHandler = new Handler(this);
 
     public DepMapView(Context context) {
         this(context, null);
@@ -128,7 +134,8 @@ public class DepMapView extends View {
     }
 
     public void zoomOnScreen(float x, float y) {
-        mapScaleAnim = new MapScaleAnim(matrixOrigin, x, y, getWidth() / 2, getHeight() / 2, getAutoZoomLevel(), 500);
+        float targetZoomLevel = getOriginZoomLevel() * getAutoZoomLevel() / getCurrentZoomLevel();
+        mapScaleAnim = new MapScaleAnim(matrix, x, y, getWidth() / 2, getHeight() / 2, targetZoomLevel, 500);
         mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
         mapScaleAnim.start();
         Message.obtain(mapZoomHandler, 0).sendToTarget();
@@ -164,6 +171,15 @@ public class DepMapView extends View {
     private float getFillBorderZoomLevel() {
         matrixOrigin.mapRect(tmpRect, rectMapOrigin);
         return rectView.width() / tmpRect.width() * rectView.height() / tmpRect.height();
+    }
+
+    public float getCurrentZoomLevel() {
+        matrix.getValues(matrixValues);
+        return matrixValues[Matrix.MSCALE_X];
+    }
+
+    public float getOriginZoomLevel() {
+        return matrixOriginValues[Matrix.MSCALE_X];
     }
 
     /**
@@ -209,6 +225,7 @@ public class DepMapView extends View {
         rectMapOrigin.set(0f, 0f, map.getWidth(), map.getHeight());
         rectView.set(0f, 0f, getWidth(), getHeight());
         matrixOrigin.setRectToRect(rectMapOrigin, rectView, ScaleToFit.CENTER);
+        matrixOrigin.getValues(matrixOriginValues);
         if (matrix.isIdentity()) {
             matrix.set(matrixOrigin);
         }
