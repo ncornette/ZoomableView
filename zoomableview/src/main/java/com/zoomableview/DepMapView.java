@@ -95,6 +95,7 @@ public class DepMapView extends View {
         mMaxZoomLevel = a.getFloat(R.styleable.com_zoomableview_DepMapView_maxZoomLevel, 3f);
         mMaxZoomFill = a.getBoolean(R.styleable.com_zoomableview_DepMapView_maxZoomFill, mMaxZoomLevel < 0);
 
+        if (DEBUG) debugPaint = new Paint();
     }
 
     /**
@@ -169,11 +170,24 @@ public class DepMapView extends View {
      * @return zoom level for auto zoom request or Max zoom allowed.
      */
     protected float getAutoZoomLevel() {
+        final float ret;
         if (mAutoZoomFill) {
-            return Math.min(getMaxZoomLevel(), getFillBorderZoomLevel());
+            ret = Math.min(getMaxZoomLevel(), getFillBorderZoomLevel());
         } else {
-            return mAutoZoomLevel;
+            ret = mAutoZoomLevel;
         }
+        if (DEBUG) Log.v(TAG, "getAutoZoomLevel, ret: " + ret);
+        return ret;
+    }
+
+    public float setAutoZoomLevel(float autoZoomLevel) {
+        if (autoZoomLevel < 0) {
+            mAutoZoomFill = true;
+        } else {
+            mAutoZoomFill = false;
+        }
+        mAutoZoomLevel = autoZoomLevel;
+        return getAutoZoomLevel();
     }
 
     /**
@@ -198,7 +212,6 @@ public class DepMapView extends View {
         if (matrix.isIdentity()) {
             matrix.set(matrixOrigin);
         }
-        if (DEBUG) debugPaint = new Paint();
     }
 
     @Override

@@ -190,8 +190,8 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     @Override
     public boolean onDoubleTap(MotionEvent e) {
         if (DEBUG) Log.v(TAG, "onDoubleTap");
-        if (mDoubleTapZoom) zoomToggle(e.getX(), e.getY());
         mapListener.onDoubleTap(e.getX(), e.getY());
+        if (mDoubleTapZoom) zoomToggle(e.getX(), e.getY());
         return false;
     }
 
