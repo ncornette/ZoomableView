@@ -16,6 +16,10 @@ import android.view.MotionEvent;
 import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.GestureDetector.OnGestureListener;
 
+/**
+ * @author Nicolas CORNETTE
+ * Zoomable view that can be controlled by touch
+ */
 public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListener, OnGestureListener {
 
     private static final String TAG = DepMapViewTouchable.class.getSimpleName();
