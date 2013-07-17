@@ -1,7 +1,7 @@
 package com.zoomableview.events;
 
 
-public interface ScaleListenerCompat {
+public interface ScaleListener {
 
     public boolean onScale(float scaleFactor, float focusX, float focusY);
 
