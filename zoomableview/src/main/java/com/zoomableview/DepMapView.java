@@ -239,11 +239,6 @@ public class DepMapView extends View implements Callback {
         }
     }
 
-    private void reset() {
-        resetOrigin();
-        resetPosition();
-    }
-
     private void resetOrigin() {
         if (rectView.isEmpty()) {
             matrixOrigin.reset();
