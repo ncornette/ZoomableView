@@ -20,7 +20,8 @@ import android.view.View;
 import android.view.animation.Transformation;
 
 /**
- * 
+ * @author Nicolas CORNETTE
+ * Base Class for Zoomable View, zoom level can be controlled by code
  */
 public class DepMapView extends View implements Callback {
 

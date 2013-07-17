@@ -10,6 +10,11 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector.OnScaleGestureListener;
 import android.view.animation.BounceInterpolator;
 
+/**
+ * @author Nicolas CORNETTE
+ * Zoomable View that can be controlled by touch and including PinchToZoom 
+ * for multitouch devices only
+ */
 @TargetApi(value = 8)
 public class DepMapViewScalable extends DepMapViewTouchable implements OnScaleGestureListener {
 
