@@ -45,6 +45,7 @@ public abstract class ScaleHandler {
 
         @Override
         public boolean handleTouchEvent(MotionEvent event) {
+            // Unable to handle scale events
             return false;
         }
 
