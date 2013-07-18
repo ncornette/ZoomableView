@@ -10,10 +10,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.animation.BounceInterpolator;
 
-import com.zoomableview.events.MotionEventHandler;
-import com.zoomableview.events.VoidScaleHandler;
-import com.zoomableview.events.ScaleHandlerFroyo;
-import com.zoomableview.events.ScaleListener;
+import com.zoomableview.ScaleHandler.ScaleListener;
 
 /**
  * @author Nicolas CORNETTE
@@ -27,7 +24,7 @@ public class DepMapViewScalable extends DepMapViewTouchable implements ScaleList
     private float[] matrixValues = new float[9];
     private float[] matrixOriginValues = new float[9];
     Matrix savedMatrix = new Matrix();
-    private MotionEventHandler mScaleHandler;
+    private ScaleHandler mScaleHandler;
 
     public DepMapViewScalable(Context context) {
         super(context);
@@ -45,11 +42,7 @@ public class DepMapViewScalable extends DepMapViewTouchable implements ScaleList
     }
 
     private void init() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO) {
-            mScaleHandler = new ScaleHandlerFroyo(getContext(), this);
-        } else {
-            mScaleHandler = new VoidScaleHandler();
-        }
+        mScaleHandler = ScaleHandler.getInstance(getContext(), this);
     }
 
     @Override
@@ -80,17 +73,6 @@ public class DepMapViewScalable extends DepMapViewTouchable implements ScaleList
 
     @Override
     public boolean onScale(float scaleFactor, float focusX, float focusY) {
-        if (DEBUG)
-            Log.v(TAG, "Scale Begin");
-        mapListener.onSingleTapCancelled();
-        mapListener.onTouchScale(scaleFactor, focusX, focusY);
-        scaling = true;
-        zoomed = true;
-        return true;
-    }
-
-    @Override
-    public boolean onScaleBegin(float scaleFactor, float focusX, float focusY) {
         if (!zooming()) {
             savedMatrix.set(matrix);
             matrix.postScale(scaleFactor, scaleFactor, focusX, focusY);
@@ -102,6 +84,17 @@ public class DepMapViewScalable extends DepMapViewTouchable implements ScaleList
                 invalidate();
             }
         }
+        return true;
+    }
+
+    @Override
+    public boolean onScaleBegin(float scaleFactor, float focusX, float focusY) {
+        if (DEBUG)
+            Log.v(TAG, "Scale Begin");
+        mapListener.onSingleTapCancelled();
+        mapListener.onTouchScale(scaleFactor, focusX, focusY);
+        scaling = true;
+        zoomed = true;
         return true;
     }
 
