@@ -3,38 +3,46 @@ package com.zoomableview;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Matrix;
+import android.os.Build;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector.OnScaleGestureListener;
 import android.view.animation.BounceInterpolator;
+
+import com.zoomableview.ScaleHandler.ScaleListener;
 
 /**
  * @author Nicolas CORNETTE
  * Zoomable View that can be controlled by touch and including PinchToZoom 
  * for multitouch devices only
  */
-@TargetApi(value = 8)
-public class DepMapViewScalable extends DepMapViewTouchable implements OnScaleGestureListener {
+@TargetApi(Build.VERSION_CODES.DONUT)
+public class DepMapViewScalable extends DepMapViewTouchable implements ScaleListener {
 
     private static final String TAG = DepMapViewScalable.class.getSimpleName();
-    private android.view.ScaleGestureDetector scaleDetector;
     private float[] matrixValues = new float[9];
     private float[] matrixOriginValues = new float[9];
     Matrix savedMatrix = new Matrix();
+    private ScaleHandler mScaleHandler;
 
     public DepMapViewScalable(Context context) {
-        this(context, null);
+        super(context);
+        init();
     }
 
     public DepMapViewScalable(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+        super(context, attrs);
+        init();
     }
 
     public DepMapViewScalable(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        scaleDetector = new android.view.ScaleGestureDetector(this.getContext(), this);
+        init();
+    }
+
+    private void init() {
+        mScaleHandler = ScaleHandler.getInstance(getContext(), this);
     }
 
     @Override
@@ -46,7 +54,7 @@ public class DepMapViewScalable extends DepMapViewTouchable implements OnScaleGe
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        scaleDetector.onTouchEvent(event);
+        mScaleHandler.handleTouchEvent(event);
         return super.onTouchEvent(event);
     }
 
@@ -64,10 +72,10 @@ public class DepMapViewScalable extends DepMapViewTouchable implements OnScaleGe
     }
 
     @Override
-    public boolean onScale(android.view.ScaleGestureDetector detector) {
+    public boolean onScale(float scaleFactor, float focusX, float focusY) {
         if (!zooming()) {
             savedMatrix.set(matrix);
-            matrix.postScale(detector.getScaleFactor(), detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
+            matrix.postScale(scaleFactor, scaleFactor, focusX, focusY);
             matrix.getValues(matrixValues);
             if (matrixValues[Matrix.MSCALE_X] < matrixOriginValues[Matrix.MSCALE_X] / 1.5f ||
                     matrixValues[Matrix.MSCALE_X] > matrixOriginValues[Matrix.MSCALE_X] * 5f) {
@@ -80,19 +88,20 @@ public class DepMapViewScalable extends DepMapViewTouchable implements OnScaleGe
     }
 
     @Override
-    public boolean onScaleBegin(android.view.ScaleGestureDetector detector) {
-        if (DEBUG) Log.v(TAG, "Scale Begin");
+    public boolean onScaleBegin(float scaleFactor, float focusX, float focusY) {
+        if (DEBUG)
+            Log.v(TAG, "Scale Begin");
         mapListener.onSingleTapCancelled();
-        mapListener.onTouchScale(detector.getScaleFactor(),
-                detector.getFocusX(), detector.getFocusY());
+        mapListener.onTouchScale(scaleFactor, focusX, focusY);
         scaling = true;
         zoomed = true;
         return true;
     }
 
     @Override
-    public void onScaleEnd(android.view.ScaleGestureDetector detector) {
-        if (DEBUG) Log.v(TAG, "Scale End");
+    public void onScaleEnd(float scaleFactor, float focusX, float focusY) {
+        if (DEBUG)
+            Log.v(TAG, "Scale End");
         updateDiffRect();
         matrix.getValues(matrixValues);
         scaling = false;
