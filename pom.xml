@@ -36,7 +36,22 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                    <artifactId>wagon-ssh</artifactId>
+                <version>1.0</version>
+            </extension>
+        </extensions>
+
+    </build>
+
+    <distributionManagement>
+        <repository>
+            <id>ssh-repository</id>
+            <url>scp://maven@raspberrypi/home/maven/repository</url>
+        </repository>
+    </distributionManagement>
 	
     <profiles>
 		<profile>
