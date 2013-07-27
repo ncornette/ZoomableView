@@ -32,7 +32,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<sdk>
-						<platform>16</platform>
+						<platform>17</platform>
 					</sdk>
 				</configuration>
 			</plugin>
