@@ -39,8 +39,8 @@
         <extensions>
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
-                    <artifactId>wagon-ssh</artifactId>
-                <version>1.0</version>
+                    <artifactId>wagon-webdav-jackrabbit</artifactId>
+                <version>2.4</version>
             </extension>
         </extensions>
 
@@ -48,8 +48,8 @@
 
     <distributionManagement>
         <repository>
-            <id>ssh-repository</id>
-            <url>scp://maven@nkouml.no-ip.org/home/maven/repository</url>
+            <id>nkouml-maven-repository</id>
+            <url>dav:http://nkouml.no-ip.org/maven/repository</url>
         </repository>
     </distributionManagement>
 	
