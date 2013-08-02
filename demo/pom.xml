@@ -4,7 +4,7 @@
 	<parent>
         <artifactId>parent</artifactId>
         <groupId>com.zoomableview</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
 	<artifactId>demo</artifactId>
 	<packaging>apk</packaging>
