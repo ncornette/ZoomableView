@@ -236,7 +236,7 @@ public class DepMapView extends View implements Callback {
             matrixValues[Matrix.MTRANS_X] += (rectView.width() - tmpRect.width()) / 2;
             matrixValues[Matrix.MTRANS_Y] += (rectView.height() - tmpRect.height()) / 2;
             matrix.setValues(matrixValues);
-            zoomed = zoomed || changed;
+            zoomed = matrixValues[Matrix.MSCALE_X] != matrixOriginValues[Matrix.MSCALE_X];
         }
     }
 
