@@ -99,7 +99,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     private RectF rectMapUpdate = new RectF();
     private boolean mDoubleTapZoom;
     private Matrix matrixTranslate = new Matrix();
-
+    private float mflingScale;
 
     public DepMapViewTouchable(Context context) {
         this(context, null);
@@ -117,6 +117,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_DepMapView, defStyle, 0);
 
         mDoubleTapZoom = a.getBoolean(R.styleable.com_zoomableview_DepMapView_doubletabZoom, true);
+        mflingScale = a.getFloat(R.styleable.com_zoomableview_DepMapView_flingScale, 2.0f);
 
         a.recycle();
     }
@@ -259,8 +260,8 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
             float velocityY) {
         if (DEBUG) Log.v(TAG, "onFling");
         if (!zooming()) {
-            mapScaleAnim = new MapScaleAnim(matrix, 0, 0, velocityX, velocityY, 1, 1000);
-            mapScaleAnim.setInterpolator(new DecelerateInterpolator());
+            mapScaleAnim = new MapScaleAnim(matrix, 0, 0, velocityX / mflingScale, velocityY / mflingScale, 1, 1000);
+            mapScaleAnim.setInterpolator(new DecelerateInterpolator(mflingScale));
             mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
             mapScaleAnim.start();
             Message.obtain(mapZoomHandler, 0).sendToTarget();

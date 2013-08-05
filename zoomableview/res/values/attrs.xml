@@ -11,6 +11,9 @@
         <attr name="maxZoomLevel" format="float" />
 
         <attr name="doubletabZoom" format="boolean" />
+        
+        <!-- 1 slow deceleration, 2 (default), 3, 4, etc... : faster deceleration -->
+        <attr name="flingScale" format="float" />
     </declare-styleable>
 
 </resources>
