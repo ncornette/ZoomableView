@@ -15,6 +15,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.GestureDetector.OnGestureListener;
+import android.view.animation.DecelerateInterpolator;
 
 /**
  * @author Nicolas CORNETTE
@@ -258,7 +259,11 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
             float velocityY) {
         if (DEBUG) Log.v(TAG, "onFling");
         if (!zooming()) {
-            // TODO: implement fling here
+            mapScaleAnim = new MapScaleAnim(matrix, 0, 0, velocityX, velocityY, 1, 1000);
+            mapScaleAnim.setInterpolator(new DecelerateInterpolator());
+            mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
+            mapScaleAnim.start();
+            Message.obtain(mapZoomHandler, 0).sendToTarget();
         }
         return false;
     }
