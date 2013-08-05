@@ -1,6 +1,7 @@
 package com.zoomableview;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -162,6 +163,8 @@ public class DepMapView extends View implements Callback {
      * @param onY
      */
     public void zoomToggle(float onX, float onY) {
+        if (DEBUG)
+            Log.v(TAG, String.format("zoomToggle (zoomed:%b)", zoomed));
         if (!zoomed) {
             zoomOnScreen(onX, onY);
         } else {
@@ -238,6 +241,13 @@ public class DepMapView extends View implements Callback {
             matrix.setValues(matrixValues);
             zoomed = matrixValues[Matrix.MSCALE_X] != matrixOriginValues[Matrix.MSCALE_X];
         }
+    }
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        if (DEBUG)
+            Log.v(TAG, "onConfigurationChanged. config:" + newConfig);
+        super.onConfigurationChanged(newConfig);
     }
 
     private void resetOrigin() {
