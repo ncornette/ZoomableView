@@ -9,7 +9,7 @@ import android.view.animation.TranslateAnimation;
 /**
  * @author nic Scale & Translate animation
  */
-public class MapScaleAnim extends AnimationSet {
+public class ZoomScaleAnim extends AnimationSet {
 
     private float[] iMatrixs = new float[9];
     private float[] tMatrixs = new float[9];
@@ -51,7 +51,7 @@ public class MapScaleAnim extends AnimationSet {
      * @param target Matrix
      * @param duration in ms
      */
-    public MapScaleAnim(Matrix start, Matrix target, int duration) {
+    public ZoomScaleAnim(Matrix start, Matrix target, int duration) {
         super(true);
         this.mTargetMatrix = target;
         this.mDuration = duration;
@@ -70,7 +70,7 @@ public class MapScaleAnim extends AnimationSet {
      * @param scale rate
      * @param duration in ms
      */
-    public MapScaleAnim(Matrix start, float x, float y, float toX, float toY, float scale, int duration) {
+    public ZoomScaleAnim(Matrix start, float x, float y, float toX, float toY, float scale, int duration) {
         super(true);
         this.mDuration = duration;
         start.getValues(iMatrixs);

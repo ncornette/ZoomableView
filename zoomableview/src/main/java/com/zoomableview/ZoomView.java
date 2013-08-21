@@ -1,7 +1,6 @@
 package com.zoomableview;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,9 +23,9 @@ import android.view.animation.Transformation;
  * @author Nicolas CORNETTE
  * Base Class for Zoomable View, zoom level can be controlled by code
  */
-public class DepMapView extends View implements Callback {
+public class ZoomView extends View implements Callback {
 
-    protected static final String TAG = DepMapView.class.getSimpleName();
+    protected static final String TAG = ZoomView.class.getSimpleName();
 
     protected static Boolean DEBUG = false;
     private Paint debugPaint;
@@ -49,7 +48,7 @@ public class DepMapView extends View implements Callback {
 
     private Transformation transform;
     protected boolean zoomed;
-    protected MapScaleAnim mapScaleAnim;
+    protected ZoomScaleAnim mapScaleAnim;
 
     @Override
     public boolean handleMessage(Message msg) {
@@ -75,15 +74,15 @@ public class DepMapView extends View implements Callback {
 
     Handler mapZoomHandler = new Handler(this);
 
-    public DepMapView(Context context) {
+    public ZoomView(Context context) {
         this(context, null);
     }
 
-    public DepMapView(Context context, AttributeSet attrs) {
+    public ZoomView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public DepMapView(Context context, AttributeSet attrs, int defStyle) {
+    public ZoomView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         mapPaint = new Paint();
         mapPaint.setFilterBitmap(true);
@@ -137,11 +136,15 @@ public class DepMapView extends View implements Callback {
 
     public void zoomOnScreen(float x, float y) {
         float targetZoomLevel = getOriginZoomLevel() * getAutoZoomLevel() / getCurrentZoomLevel();
-        mapScaleAnim = new MapScaleAnim(matrix, x, y, getWidth() / 2, getHeight() / 2, targetZoomLevel, 500);
+        mapScaleAnim = new ZoomScaleAnim(matrix, x, y, getWidth() / 2, getHeight() / 2, targetZoomLevel, 500);
         mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
         mapScaleAnim.start();
-        Message.obtain(mapZoomHandler, 0).sendToTarget();
+        startZoomAnimation();
         zoomed = true;
+    }
+
+    protected void startZoomAnimation() {
+        Message.obtain(mapZoomHandler, 0).sendToTarget();
     }
 
     public void zoomOut() {
@@ -149,10 +152,10 @@ public class DepMapView extends View implements Callback {
     }
 
     public void zoomOut(int duration) {
-        mapScaleAnim = new MapScaleAnim(matrix, matrixOrigin, duration);
+        mapScaleAnim = new ZoomScaleAnim(matrix, matrixOrigin, duration);
         mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
         mapScaleAnim.start();
-        Message.obtain(mapZoomHandler, 0).sendToTarget();
+        startZoomAnimation();
         zoomed = false;
     }
 
@@ -243,12 +246,12 @@ public class DepMapView extends View implements Callback {
         }
     }
 
-    @Override
-    protected void onConfigurationChanged(Configuration newConfig) {
-        if (DEBUG)
-            Log.v(TAG, "onConfigurationChanged. config:" + newConfig);
-        super.onConfigurationChanged(newConfig);
-    }
+    // @Override
+    // protected void onConfigurationChanged(Configuration newConfig) {
+    // if (DEBUG)
+    // Log.v(TAG, "onConfigurationChanged. config:" + newConfig);
+    // super.onConfigurationChanged(newConfig);
+    // }
 
     private void resetOrigin() {
         if (rectView.isEmpty()) {
@@ -294,7 +297,7 @@ public class DepMapView extends View implements Callback {
     /**
      * 
      * @return whether the left edge of the image view touches the left edge of its container
-     * @deprecated use {@link DepMapViewTouchable#setOverScrollListener(com.zoomableview.DepMapViewTouchable.OverScrollListener)} instead
+     * @deprecated use {@link ZoomViewTouchable#setOverScrollListener(com.zoomableview.ZoomViewTouchable.OverScrollListener)} instead
      */
     @Deprecated
     public boolean isFullLeft() {
@@ -305,7 +308,7 @@ public class DepMapView extends View implements Callback {
     /**
      * 
      * @return whether the right edge of the image view touches the right edge of its container
-     * @deprecated use {@link DepMapViewTouchable#setOverScrollListener(com.zoomableview.DepMapViewTouchable.OverScrollListener)} instead
+     * @deprecated use {@link ZoomViewTouchable#setOverScrollListener(com.zoomableview.ZoomViewTouchable.OverScrollListener)} instead
      */
     @Deprecated
     public boolean isFullRight() {

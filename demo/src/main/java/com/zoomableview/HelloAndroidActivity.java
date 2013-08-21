@@ -20,7 +20,7 @@ public class HelloAndroidActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         @SuppressWarnings("unused")
-        final DepMapViewTouchable zoomable = (DepMapViewTouchable) findViewById(R.id.zoomable);
+        final ZoomViewTouchable zoomable = (ZoomViewTouchable) findViewById(R.id.zoomable);
 
     }
 

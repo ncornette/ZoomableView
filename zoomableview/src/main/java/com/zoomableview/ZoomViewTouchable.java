@@ -21,9 +21,9 @@ import android.view.animation.DecelerateInterpolator;
  * @author Nicolas CORNETTE
  * Zoomable view that can be controlled by touch
  */
-public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListener, OnGestureListener {
+public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, OnGestureListener {
 
-    private static final String TAG = DepMapViewTouchable.class.getSimpleName();
+    private static final String TAG = ZoomViewTouchable.class.getSimpleName();
 
     public interface OverScrollListener {
 
@@ -101,15 +101,15 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
     private Matrix matrixTranslate = new Matrix();
     private float mflingScale;
 
-    public DepMapViewTouchable(Context context) {
+    public ZoomViewTouchable(Context context) {
         this(context, null);
     }
 
-    public DepMapViewTouchable(Context context, AttributeSet attrs) {
+    public ZoomViewTouchable(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public DepMapViewTouchable(Context context, AttributeSet attrs, int defStyle) {
+    public ZoomViewTouchable(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         gestureScanner = new GestureDetector(getContext(), this);
         gestureScanner.setOnDoubleTapListener(this);
@@ -189,7 +189,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         if (!equalsRect(rectMapUpdate, rectMap)) {
             // Create matrix for translation from current rect to new rect
             matrixTranslate.setRectToRect(rectMapOrigin, rectMapUpdate, ScaleToFit.FILL);
-            mapScaleAnim = new MapScaleAnim(matrix, matrixTranslate, 200);
+            mapScaleAnim = new ZoomScaleAnim(matrix, matrixTranslate, 200);
             mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
             mapScaleAnim.start();
             Message.obtain(mapZoomHandler, 0).sendToTarget();
@@ -214,10 +214,10 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
         if ((zoomed || zoomIfNeeded)) {
             matrix.mapPoints(pointF);
             if (!zoomed && zoomIfNeeded) {
-                mapScaleAnim = new MapScaleAnim(matrix, pointF[0], pointF[1], getWidth() / 2, getHeight() / 2, getAutoZoomLevel(), 500);
+                mapScaleAnim = new ZoomScaleAnim(matrix, pointF[0], pointF[1], getWidth() / 2, getHeight() / 2, getAutoZoomLevel(), 500);
                 zoomed = true;
             } else {
-                mapScaleAnim = new MapScaleAnim(matrix, pointF[0], pointF[1], getWidth() / 2, getHeight() / 2, 1, 500);
+                mapScaleAnim = new ZoomScaleAnim(matrix, pointF[0], pointF[1], getWidth() / 2, getHeight() / 2, 1, 500);
             }
             mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
             mapScaleAnim.start();
@@ -260,7 +260,7 @@ public class DepMapViewTouchable extends DepMapView implements OnDoubleTapListen
             float velocityY) {
         if (DEBUG) Log.v(TAG, "onFling");
         if (!zooming()) {
-            mapScaleAnim = new MapScaleAnim(matrix, 0, 0, velocityX / mflingScale, velocityY / mflingScale, 1, 1000);
+            mapScaleAnim = new ZoomScaleAnim(matrix, 0, 0, velocityX / mflingScale, velocityY / mflingScale, 1, 1000);
             mapScaleAnim.setInterpolator(new DecelerateInterpolator(mflingScale));
             mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
             mapScaleAnim.start();

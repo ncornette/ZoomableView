@@ -7,7 +7,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin" >
 
-    <com.zoomableview.DepMapViewScalable
+    <com.zoomableview.ZoomViewScalable
         android:id="@+id/zoomable"
         app:mapref="@drawable/chicken_cartoon_500"
         style="@style/demo_zoom_default"

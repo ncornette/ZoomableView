@@ -18,25 +18,25 @@ import com.zoomableview.ScaleHandler.ScaleListener;
  * for multitouch devices only
  */
 @TargetApi(Build.VERSION_CODES.DONUT)
-public class DepMapViewScalable extends DepMapViewTouchable implements ScaleListener {
+public class ZoomViewScalable extends ZoomViewTouchable implements ScaleListener {
 
-    private static final String TAG = DepMapViewScalable.class.getSimpleName();
+    private static final String TAG = ZoomViewScalable.class.getSimpleName();
     private float[] matrixValues = new float[9];
     private float[] matrixOriginValues = new float[9];
     Matrix savedMatrix = new Matrix();
     private ScaleHandler mScaleHandler;
 
-    public DepMapViewScalable(Context context) {
+    public ZoomViewScalable(Context context) {
         super(context);
         init();
     }
 
-    public DepMapViewScalable(Context context, AttributeSet attrs) {
+    public ZoomViewScalable(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public DepMapViewScalable(Context context, AttributeSet attrs, int defStyle) {
+    public ZoomViewScalable(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
@@ -107,10 +107,10 @@ public class DepMapViewScalable extends DepMapViewTouchable implements ScaleList
         scaling = false;
 
         if (matrixValues[Matrix.MSCALE_X] < matrixOriginValues[Matrix.MSCALE_X]) {
-            mapScaleAnim = new MapScaleAnim(matrix, matrixOrigin, 200);
+            mapScaleAnim = new ZoomScaleAnim(matrix, matrixOrigin, 200);
             zoomed = false;
         } else if (matrixValues[Matrix.MSCALE_X] > matrixOriginValues[Matrix.MSCALE_X] * getMaxZoomLevel()) {
-            mapScaleAnim = new MapScaleAnim(matrix, getWidth() / 2, getHeight() / 2, getWidth() / 2, getHeight() / 2,
+            mapScaleAnim = new ZoomScaleAnim(matrix, getWidth() / 2, getHeight() / 2, getWidth() / 2, getHeight() / 2,
                     matrixOriginValues[Matrix.MSCALE_X] / matrixValues[Matrix.MSCALE_X] * getMaxZoomLevel(), 200);
         } else {
             return;
