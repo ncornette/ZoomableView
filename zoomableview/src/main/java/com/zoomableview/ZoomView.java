@@ -213,6 +213,15 @@ public class ZoomView extends View implements Callback {
         return getAutoZoomLevel();
     }
 
+    public void setMaxZoomLevel(float maxZoomLevel) {
+        this.mMaxZoomLevel = maxZoomLevel;
+        this.mMaxZoomFill = false;
+    }
+
+    public void setMaxZoomFill(boolean maxZoomFill) {
+        this.mMaxZoomFill = maxZoomFill;
+    }
+
     /**
      * @return max allowed zoom level.
      */
