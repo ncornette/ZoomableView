@@ -5,16 +5,16 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Matrix.ScaleToFit;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.graphics.Matrix.ScaleToFit;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.GestureDetector.OnGestureListener;
+import android.view.MotionEvent;
 import android.view.animation.DecelerateInterpolator;
 
 /**
@@ -100,6 +100,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
     private boolean mDoubleTapZoom;
     private Matrix matrixTranslate = new Matrix();
     private float mflingScale;
+    private float mOverScrollRate;
 
     public ZoomViewTouchable(Context context) {
         this(context, null);
@@ -117,7 +118,8 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_DepMapView, defStyle, 0);
 
         mDoubleTapZoom = a.getBoolean(R.styleable.com_zoomableview_DepMapView_doubletabZoom, true);
-        mflingScale = a.getFloat(R.styleable.com_zoomableview_DepMapView_flingScale, 2.0f);
+        mflingScale = a.getFloat(R.styleable.com_zoomableview_DepMapView_flingScale, 3.0f);
+        mOverScrollRate = a.getFloat(R.styleable.com_zoomableview_DepMapView_overScrollTranslate, 0.3f);
 
         a.recycle();
     }
@@ -283,18 +285,18 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
             matrix.mapRect(rectMap, rectMapOrigin);
 
             if (rectView.right > rectMap.right && distanceX > 0) {
-                distanceX *= 0.3f;
+                distanceX *= mOverScrollRate;
                 mOverScrollListener.onOverscrollX(rectMap.right - Math.min(rectMapUpdate.right, rectView.right));
             } else if (rectView.left < rectMap.left && distanceX < 0) {
-                distanceX *= 0.3f;
+                distanceX *= mOverScrollRate;
                 mOverScrollListener.onOverscrollX(rectMap.left - Math.max(rectMapUpdate.left, rectView.left));
             }
 
             if (rectView.bottom > rectMap.bottom && distanceY > 0) {
-                distanceY *= 0.3f;
+                distanceY *= mOverScrollRate;
                 mOverScrollListener.onOverscrollY(rectMap.bottom - Math.min(rectMapUpdate.bottom, rectView.bottom));
             } else if (rectView.top < rectMap.top && distanceY < 0) {
-                distanceY *= 0.3f;
+                distanceY *= mOverScrollRate;
                 mOverScrollListener.onOverscrollY(rectMap.top - Math.max(rectMapUpdate.top, rectView.top));
             }
 

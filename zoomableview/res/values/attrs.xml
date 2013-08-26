@@ -12,8 +12,11 @@
 
         <attr name="doubletabZoom" format="boolean" />
         
-        <!-- 1 slow deceleration, 2 (default), 3, 4, etc... : faster deceleration -->
+        <!-- 1 slow deceleration, 3 (default), 2 slower deceleration, 4, 5, etc... : faster deceleration -->
         <attr name="flingScale" format="float" />
+
+        <!-- 1: like normal, 0,3 (default), 0: no overscroll -->
+        <attr name="overScrollTranslate" format="float" />
     </declare-styleable>
 
 </resources>
