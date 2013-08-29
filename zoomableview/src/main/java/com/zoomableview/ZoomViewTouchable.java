@@ -302,6 +302,8 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
             } else if (rectView.left + distanceX < rectMap.left && distanceX < 0) {
                 mOverScroller.onScrollX(rectMap, rectView, distanceX, matrix);
                 mOverScrollListener.onOverscrollX(rectMap.left - Math.max(rectMapUpdate.left, rectView.left));
+            } else {
+                matrix.postTranslate(-distanceX, 0);
             }
 
             if (rectView.bottom + distanceY > rectMap.bottom && distanceY > 0) {
@@ -310,6 +312,8 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
             } else if (rectView.top + distanceY < rectMap.top && distanceY < 0) {
                 mOverScroller.onScrollY(rectMap, rectView, distanceY, matrix);
                 mOverScrollListener.onOverscrollY(rectMap.top - Math.max(rectMapUpdate.top, rectView.top));
+            } else {
+                matrix.postTranslate(0, -distanceY);
             }
 
             moved = true;
