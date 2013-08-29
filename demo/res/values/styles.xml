@@ -20,6 +20,7 @@
     <style name="demo_zoom_default">
         <item name="autoZoomFill">true</item>
         <item name="maxZoomLevel">3</item>
+        <item name="overScrollTranslate">0</item>
     </style>
     
 </resources>

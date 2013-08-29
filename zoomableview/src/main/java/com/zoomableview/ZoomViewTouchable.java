@@ -17,6 +17,10 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.animation.DecelerateInterpolator;
 
+import com.zoomableview.scroller.ScrollDelegate;
+import com.zoomableview.scroller.ScrollOver;
+import com.zoomableview.scroller.ScrollStop;
+
 /**
  * @author Nicolas CORNETTE
  * Zoomable view that can be controlled by touch
@@ -100,7 +104,8 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
     private boolean mDoubleTapZoom;
     private Matrix matrixTranslate = new Matrix();
     private float mflingScale;
-    private float mOverScrollRate;
+
+    private ScrollDelegate mOverScroller;
 
     public ZoomViewTouchable(Context context) {
         this(context, null);
@@ -119,7 +124,13 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
 
         mDoubleTapZoom = a.getBoolean(R.styleable.com_zoomableview_DepMapView_doubletabZoom, true);
         mflingScale = a.getFloat(R.styleable.com_zoomableview_DepMapView_flingScale, 3.0f);
-        mOverScrollRate = a.getFloat(R.styleable.com_zoomableview_DepMapView_overScrollTranslate, 0.3f);
+        float overScrollRate = a.getFloat(R.styleable.com_zoomableview_DepMapView_overScrollTranslate, 0.3f);
+
+        if (overScrollRate == 0) {
+            mOverScroller = new ScrollStop();
+        } else {
+            mOverScroller = new ScrollOver(overScrollRate);
+        }
 
         a.recycle();
     }
@@ -261,7 +272,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
             float velocityY) {
         if (DEBUG) Log.v(TAG, "onFling");
-        if (!zooming()) {
+        if (!zooming() && moved) {
             mapScaleAnim = new ZoomScaleAnim(matrix, 0, 0, velocityX / mflingScale, velocityY / mflingScale, 1, 1000);
             mapScaleAnim.setInterpolator(new DecelerateInterpolator(mflingScale));
             mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
@@ -280,28 +291,28 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
             float distanceY) {
-        // if (DEBUG) Log.v(TAG, String.format("onScroll : dist : %f, %f ", distanceX, distanceY));
+        if (DEBUG)
+            Log.v(TAG, String.format("onScroll : dist : %f, %f ", distanceX, distanceY));
         if (!zooming()) {
             matrix.mapRect(rectMap, rectMapOrigin);
 
-            if (rectView.right > rectMap.right && distanceX > 0) {
-                distanceX *= mOverScrollRate;
+            if (rectView.right + distanceX > rectMap.right && distanceX > 0) {
+                mOverScroller.onScrollX(rectMap, rectView, distanceX, matrix);
                 mOverScrollListener.onOverscrollX(rectMap.right - Math.min(rectMapUpdate.right, rectView.right));
-            } else if (rectView.left < rectMap.left && distanceX < 0) {
-                distanceX *= mOverScrollRate;
+            } else if (rectView.left + distanceX < rectMap.left && distanceX < 0) {
+                mOverScroller.onScrollX(rectMap, rectView, distanceX, matrix);
                 mOverScrollListener.onOverscrollX(rectMap.left - Math.max(rectMapUpdate.left, rectView.left));
             }
 
-            if (rectView.bottom > rectMap.bottom && distanceY > 0) {
-                distanceY *= mOverScrollRate;
+            if (rectView.bottom + distanceY > rectMap.bottom && distanceY > 0) {
+                mOverScroller.onScrollY(rectMap, rectView, distanceY, matrix);
                 mOverScrollListener.onOverscrollY(rectMap.bottom - Math.min(rectMapUpdate.bottom, rectView.bottom));
-            } else if (rectView.top < rectMap.top && distanceY < 0) {
-                distanceY *= mOverScrollRate;
+            } else if (rectView.top + distanceY < rectMap.top && distanceY < 0) {
+                mOverScroller.onScrollY(rectMap, rectView, distanceY, matrix);
                 mOverScrollListener.onOverscrollY(rectMap.top - Math.max(rectMapUpdate.top, rectView.top));
             }
 
             moved = true;
-            matrix.postTranslate(-distanceX, -distanceY);
             invalidate();
         }
         return true;

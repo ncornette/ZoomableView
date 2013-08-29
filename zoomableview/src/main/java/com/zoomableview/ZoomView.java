@@ -27,7 +27,7 @@ public class ZoomView extends View implements Callback {
 
     protected static final String TAG = ZoomView.class.getSimpleName();
 
-    protected static Boolean DEBUG = false;
+    protected static Boolean DEBUG = true;
     private Paint debugPaint;
 
     private Bitmap map;
