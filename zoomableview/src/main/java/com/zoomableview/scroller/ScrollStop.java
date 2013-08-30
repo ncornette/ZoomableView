@@ -3,6 +3,11 @@ package com.zoomableview.scroller;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 
+/**
+ * Stop scrolling when content is inside container
+ * @author nic
+ *
+ */
 public class ScrollStop implements ScrollDelegate {
 
     @Override

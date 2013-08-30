@@ -3,6 +3,11 @@ package com.zoomableview.scroller;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 
+/**
+ * Continue scrolling according to a translate factor
+ * @author nic
+ *
+ */
 public class ScrollOver implements ScrollDelegate {
 
     private final float mOverScrollRate;
