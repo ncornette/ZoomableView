@@ -12,7 +12,7 @@ public class ScrollStop implements ScrollDelegate {
 
     @Override
     public boolean onScrollX(RectF content, RectF container, float distance, Matrix matrix) {
-        if (content.width() < container.width()) {
+        if (content.width() > container.width()) {
             if (distance < 0) {
                 distance = content.left - container.left;
             } else {
