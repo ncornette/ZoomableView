@@ -18,7 +18,10 @@ public class ScrollStop implements ScrollDelegate {
             } else {
                 distance = content.right - container.right;
             }
-            matrix.postTranslate(-distance, 0);
+            if (distance != 0) {
+                matrix.postTranslate(-distance, 0);
+                return true;
+            }
         }
         return false;
     }
@@ -31,7 +34,10 @@ public class ScrollStop implements ScrollDelegate {
             } else {
                 distance = content.bottom - container.bottom;
             }
-            matrix.postTranslate(0, -distance);
+            if (distance != 0) {
+                matrix.postTranslate(0, -distance);
+                return true;
+            }
         }
         return false;
     }

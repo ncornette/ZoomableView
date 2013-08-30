@@ -98,7 +98,6 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
     private GestureDetector gestureScanner;
     protected TouchMapListener mapListener = NULL_TOUCHMAP_LISTENER;
     private OverScrollListener mOverScrollListener = NULL_OVERSCROLL_LISTENER;
-    private boolean moved;
     private RectF rectMap = new RectF();
     private RectF rectMapUpdate = new RectF();
     private boolean mDoubleTapZoom;
@@ -170,10 +169,20 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
     }
 
     @Override
+    public boolean onDown(MotionEvent e) {
+        if (DEBUG)
+            Log.v(TAG, "onDown");
+        mapListener.onTouch(e.getX(), e.getY());
+        updateDiffRect();
+        mapZoomHandler.removeMessages(1);
+        return true;
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_UP) {
             if (DEBUG) Log.v(TAG, "Action_Up");
-            if (!zooming() && moved) {
+            if (!zooming() && (movedX || movedY)) {
                 translateTargetPosition();
             }
         }
@@ -245,16 +254,6 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
         return false;
     }
 
-    @Override
-    public boolean onDown(MotionEvent e) {
-        if (DEBUG) Log.v(TAG, "onDown");
-        mapListener.onTouch(e.getX(), e.getY());
-        updateDiffRect();
-        mapZoomHandler.removeMessages(1);
-        moved = false;
-        return true;
-    }
-
     protected void updateDiffRect() {
         // Put current map rect into rectMap
         matrix.mapRect(rectMap, rectMapOrigin);
@@ -272,7 +271,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
             float velocityY) {
         if (DEBUG) Log.v(TAG, "onFling");
-        if (!zooming() && moved) {
+        if (!zooming() && (movedX || movedY)) {
             mapScaleAnim = new ZoomScaleAnim(matrix, 0, 0, velocityX / mflingScale, velocityY / mflingScale, 1, 1000);
             mapScaleAnim.setInterpolator(new DecelerateInterpolator(mflingScale));
             mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
@@ -288,38 +287,47 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
 
     }
 
+    boolean movedX;
+    boolean movedY;
+
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
             float distanceY) {
+        movedX = false;
+        movedY = false;
         if (DEBUG)
             Log.v(TAG, String.format("onScroll : dist : %f, %f ", distanceX, distanceY));
         if (!zooming()) {
             matrix.mapRect(rectMap, rectMapOrigin);
 
-            if (rectView.right + distanceX > rectMap.right && distanceX > 0) {
-                mOverScroller.onScrollX(rectMap, rectView, distanceX, matrix);
+            if (rectView.right + distanceX >= rectMap.right && distanceX > 0) {
+                movedX = mOverScroller.onScrollX(rectMap, rectView, distanceX, matrix);
                 mOverScrollListener.onOverscrollX(rectMap.right - Math.min(rectMapUpdate.right, rectView.right));
-            } else if (rectView.left + distanceX < rectMap.left && distanceX < 0) {
-                mOverScroller.onScrollX(rectMap, rectView, distanceX, matrix);
+            } else if (rectView.left + distanceX <= rectMap.left && distanceX < 0) {
+                movedX = mOverScroller.onScrollX(rectMap, rectView, distanceX, matrix);
                 mOverScrollListener.onOverscrollX(rectMap.left - Math.max(rectMapUpdate.left, rectView.left));
-            } else {
+            } else if (distanceX != 0) {
                 matrix.postTranslate(-distanceX, 0);
+                movedX = true;
             }
 
-            if (rectView.bottom + distanceY > rectMap.bottom && distanceY > 0) {
-                mOverScroller.onScrollY(rectMap, rectView, distanceY, matrix);
+            if (rectView.bottom + distanceY >= rectMap.bottom && distanceY > 0) {
+                movedY = mOverScroller.onScrollY(rectMap, rectView, distanceY, matrix);
                 mOverScrollListener.onOverscrollY(rectMap.bottom - Math.min(rectMapUpdate.bottom, rectView.bottom));
-            } else if (rectView.top + distanceY < rectMap.top && distanceY < 0) {
-                mOverScroller.onScrollY(rectMap, rectView, distanceY, matrix);
+            } else if (rectView.top + distanceY <= rectMap.top && distanceY < 0) {
+                movedY = mOverScroller.onScrollY(rectMap, rectView, distanceY, matrix);
                 mOverScrollListener.onOverscrollY(rectMap.top - Math.max(rectMapUpdate.top, rectView.top));
-            } else {
+            } else if (distanceY != 0) {
                 matrix.postTranslate(0, -distanceY);
+                movedY = true;
             }
 
-            moved = true;
-            invalidate();
+            if (movedX || movedY) {
+                invalidate();
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     boolean zooming() {
