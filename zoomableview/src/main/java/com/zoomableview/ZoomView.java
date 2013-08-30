@@ -239,6 +239,8 @@ public class ZoomView extends View implements Callback {
         if (DEBUG) Log.v(TAG, "onLayout. changed:"+ changed);
         if (map == null)
             return;
+        if (mapScaleAnim != null)
+            mapScaleAnim.cancel();
         // Save previous view Rect
         tmpRect.set(rectView);
         rectView.set(0f, 0f, right - left, bottom - top);
