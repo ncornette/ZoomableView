@@ -358,4 +358,25 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
          }
         super.onDraw(canvas);
     }
+
+    /**
+     * Convenient method for use with ViewPager.
+     * 
+     * @return whether the left edge of the image view touches the left edge of its container
+     * @see {@link ZoomViewTouchable#setOverScrollListener(com.zoomableview.ZoomViewTouchable.OverScrollListener)}
+     */
+    public boolean isFullLeft() {
+        return rectMap.left >= rectView.left;
+    }
+
+    /**
+     * Convenient method for use with ViewPager.
+     * 
+     * @return whether the right edge of the image view touches the right edge of its container
+     * @see {@link ZoomViewTouchable#setOverScrollListener(com.zoomableview.ZoomViewTouchable.OverScrollListener)}
+     */
+    public boolean isFullRight() {
+        return rectMap.right <= rectView.right;
+    }
+
 }
