@@ -17,6 +17,7 @@ import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
 /**
@@ -48,26 +49,39 @@ public class ZoomView extends View implements Callback {
 
     private Transformation transform;
     protected boolean zoomed;
-    protected ZoomScaleAnim mapScaleAnim;
+    protected Animation mapScaleAnim;
+
+    private static final int ANIM_START = 0;
+    private static final int ANIM_CONTINUE = 1;
+    private static final int ANIM_STOP = 2;
 
     @Override
     public boolean handleMessage(Message msg) {
-        if (msg.what == 0) {
-            if (DEBUG) Log.v(TAG, "Animation Start");
-            msg.getTarget().removeMessages(1);
-            onAnimationStart();
-        }
-        if (!mapScaleAnim.hasEnded()) {
-            msg.getTarget().sendEmptyMessage(1);
-            mapScaleAnim.getTransformation(System.currentTimeMillis(), transform);
-            matrix.set(transform.getMatrix());
-            invalidate();
-        } else {
-            onAnimationEnd();
-            if (DEBUG) {
-                Log.v(TAG, "Animation End");
+        switch (msg.what) {
+            case ANIM_START:
+                if (DEBUG)
+                    Log.v(TAG, "Animation Start");
+                msg.getTarget().removeMessages(ANIM_CONTINUE);
+                onAnimationStart();
+
+            case ANIM_CONTINUE:
+                msg.getTarget().sendEmptyMessage(ANIM_CONTINUE);
+                mapScaleAnim.getTransformation(System.currentTimeMillis(), transform);
+                matrix.set(transform.getMatrix());
                 invalidate();
-            }
+                break;
+
+            case ANIM_STOP:
+                msg.getTarget().removeMessages(ANIM_CONTINUE);
+                onAnimationEnd();
+                if (DEBUG) {
+                    Log.v(TAG, "Animation End");
+                    invalidate();
+                }
+                break;
+
+            default:
+                break;
         }
         return true;
     }
@@ -144,7 +158,7 @@ public class ZoomView extends View implements Callback {
     }
 
     protected void startZoomAnimation() {
-        Message.obtain(mapZoomHandler, 0).sendToTarget();
+        Message.obtain(mapZoomHandler, ANIM_START).sendToTarget();
     }
 
     public void zoomOut() {
@@ -240,7 +254,7 @@ public class ZoomView extends View implements Callback {
         if (map == null)
             return;
         if (mapScaleAnim != null)
-            mapScaleAnim.cancel();
+            mapZoomHandler.sendMessageAtFrontOfQueue(Message.obtain(mapZoomHandler, ANIM_STOP));
         // Save previous view Rect
         tmpRect.set(rectView);
         rectView.set(0f, 0f, right - left, bottom - top);
