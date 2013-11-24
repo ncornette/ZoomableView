@@ -177,7 +177,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
             Log.v(TAG, "onDown");
         mapListener.onTouch(e.getX(), e.getY());
         updateDiffRect();
-        mapZoomHandler.removeMessages(1);
+        mapZoomHandler.removeMessages(ANIM_CONTINUE);
         return true;
     }
 
@@ -217,7 +217,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
             mapScaleAnim = new ZoomScaleAnim(matrix, matrixTranslate, 200);
             mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
             mapScaleAnim.start();
-            Message.obtain(mapZoomHandler, 0).sendToTarget();
+            Message.obtain(mapZoomHandler).sendToTarget();
         }
     }
 
@@ -246,7 +246,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
             }
             mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
             mapScaleAnim.start();
-            Message.obtain(mapZoomHandler, 0).sendToTarget();
+            Message.obtain(mapZoomHandler).sendToTarget();
         }
     }
 

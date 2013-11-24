@@ -159,7 +159,7 @@ public class ZoomView extends View implements Callback {
     }
 
     protected void startZoomAnimation() {
-        Message.obtain(mapZoomHandler, ANIM_START).sendToTarget();
+        Message.obtain(mapZoomHandler).sendToTarget();
     }
 
     public void zoomOut() {
