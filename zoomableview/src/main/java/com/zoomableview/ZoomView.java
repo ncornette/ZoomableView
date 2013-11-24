@@ -254,7 +254,7 @@ public class ZoomView extends View implements Callback {
         if (DEBUG) Log.v(TAG, "onLayout. changed:"+ changed);
         if (map == null)
             return;
-        if (mapScaleAnim != null)
+        if (mapScaleAnim != null && changed)
             mapZoomHandler.sendMessageAtFrontOfQueue(Message.obtain(mapZoomHandler, ANIM_STOP));
         // Save previous view Rect
         tmpRect.set(rectView);
