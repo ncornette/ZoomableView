@@ -65,7 +65,7 @@ public class ZoomView extends View implements Callback {
                 onAnimationStart();
 
             case ANIM_CONTINUE:
-                msg.getTarget().sendEmptyMessage(ANIM_CONTINUE);
+                msg.getTarget().sendEmptyMessage(mapScaleAnim.hasEnded() ? ANIM_STOP : ANIM_CONTINUE);
                 mapScaleAnim.getTransformation(System.currentTimeMillis(), transform);
                 matrix.set(transform.getMatrix());
                 invalidate();
