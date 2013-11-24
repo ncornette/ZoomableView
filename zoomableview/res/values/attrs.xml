@@ -2,25 +2,23 @@
 <resources>
 
     <declare-styleable name="com.zoomableview.ZoomView">
-        <attr name="mapref" format="reference" />
-
-        <attr name="autoZoomFill" format="boolean" />
-        <attr name="autoZoomLevel" format="float" />
-
-        <attr name="maxZoomFill" format="boolean" />
-        <attr name="maxZoomLevel" format="float" />
-
-        <attr name="doubletabZoom" format="boolean" />
         
-        <!-- 1 slow deceleration, 3 (default), 2 slower deceleration, 4, 5, etc... : faster deceleration -->
-        <attr name="flingScale" format="float" />
+        <!-- Attributes for ZoomView -->
+        <attr name="mapref" format="reference" /> <!-- background picture, needed to set view size -->
+        <attr name="autoZoomFill" format="boolean" /> <!-- set default zoom to fill view port -->
+        <attr name="autoZoomLevel" format="float" /> <!-- set default zoom to custom level -->
+        <attr name="maxZoomFill" format="boolean" /> <!-- set max zoom to fill view port -->
+        <attr name="maxZoomLevel" format="float" /> <!-- set max zoom to custom level -->
 
-        <!-- 1: like normal, 0,3 (default), 0: no overscroll -->
-        <attr name="overScrollTranslateFactor" format="float" />
+        <!-- Attributes for ZoomViewTouchable -->
+        <attr name="doubletabZoom" format="boolean" /> <!-- Use to disable doubleTap Zoom -->
+        <attr name="flingScale" format="float" /> <!-- 1: very long fling, 10: very short fling -->
+        <attr name="overScrollTranslateFactor" format="float" /> <!-- 1: keep scroll, 0: no overscroll, 0.3: default -->
 
-        <attr name="minScaleFactor" format="float" />
-        <attr name="maxScaleFactor" format="float" />
+        <!-- Attributes for ZoomViewScalable -->
+        <attr name="minScaleFactor" format="float" /> <!-- min scalable zoom level -->
+        <attr name="maxScaleFactor" format="float" /> <!-- max scalable zoom level -->
         
-        </declare-styleable>
+    </declare-styleable>
 
 </resources>
