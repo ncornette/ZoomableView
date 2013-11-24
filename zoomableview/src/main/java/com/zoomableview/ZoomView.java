@@ -18,6 +18,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.Transformation;
 
 /**
@@ -66,7 +67,7 @@ public class ZoomView extends View implements Callback {
 
             case ANIM_CONTINUE:
                 msg.getTarget().sendEmptyMessage(mapScaleAnim.hasEnded() ? ANIM_STOP : ANIM_CONTINUE);
-                mapScaleAnim.getTransformation(System.currentTimeMillis(), transform);
+                mapScaleAnim.getTransformation(AnimationUtils.currentAnimationTimeMillis(), transform);
                 matrix.set(transform.getMatrix());
                 invalidate();
                 break;
@@ -295,9 +296,13 @@ public class ZoomView extends View implements Callback {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (DEBUG) Log.v(TAG, "onDraw.");
 
         canvas.concat(matrix);
+
+        if (DEBUG) {
+            matrix.getValues(matrixValues);
+            Log.v(TAG, "onDraw, x:" + matrixValues[matrix.MTRANS_X] + ", y:" + matrixValues[matrix.MTRANS_Y]);
+        }
 
         // Draw full map
         if (map != null)

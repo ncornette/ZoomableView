@@ -103,6 +103,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
     private boolean mDoubleTapZoom;
     private Matrix matrixTranslate = new Matrix();
     private float mflingScale;
+    private DecelerateInterpolator decelerateInterpolator;
 
     private ScrollDelegate mOverScroller;
 
@@ -123,6 +124,8 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
 
         mDoubleTapZoom = a.getBoolean(R.styleable.com_zoomableview_DepMapView_doubletabZoom, true);
         mflingScale = a.getFloat(R.styleable.com_zoomableview_DepMapView_flingScale, 3.0f);
+        decelerateInterpolator = new DecelerateInterpolator(mflingScale);
+
         float overScrollRate = a.getFloat(R.styleable.com_zoomableview_DepMapView_overScrollTranslateFactor, 0.3f);
 
         if (overScrollRate == 0) {
@@ -270,13 +273,14 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
             float velocityY) {
-        if (DEBUG) Log.v(TAG, "onFling");
+        if (DEBUG)
+            Log.v(TAG, "onFling veloxity x:" + velocityX + " velocity y:" + velocityY);
         if (!zooming() && (movedX || movedY)) {
             mapScaleAnim = new ZoomScaleAnim(matrix, 0, 0, velocityX / mflingScale, velocityY / mflingScale, 1, 1000);
-            mapScaleAnim.setInterpolator(new DecelerateInterpolator(mflingScale));
+            mapScaleAnim.setInterpolator(decelerateInterpolator);
             mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
-            mapScaleAnim.start();
-            Message.obtain(mapZoomHandler, 0).sendToTarget();
+            mapScaleAnim.startNow();
+            Message.obtain(mapZoomHandler).sendToTarget();
         }
         return false;
     }
