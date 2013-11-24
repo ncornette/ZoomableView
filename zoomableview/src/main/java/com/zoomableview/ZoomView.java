@@ -52,9 +52,9 @@ public class ZoomView extends View implements Callback {
     protected boolean zoomed;
     protected Animation mapScaleAnim;
 
-    private static final int ANIM_START = 0;
-    private static final int ANIM_CONTINUE = 1;
-    private static final int ANIM_STOP = 2;
+    protected static final int ANIM_START = 0;
+    protected static final int ANIM_CONTINUE = 1;
+    protected static final int ANIM_STOP = 2;
 
     @Override
     public boolean handleMessage(Message msg) {

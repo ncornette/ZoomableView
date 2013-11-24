@@ -335,7 +335,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
     }
 
     boolean zooming() {
-        return mapZoomHandler.hasMessages(1);
+        return mapZoomHandler.hasMessages(ANIM_CONTINUE) || mapZoomHandler.hasMessages(ANIM_START);
     }
 
     @Override
