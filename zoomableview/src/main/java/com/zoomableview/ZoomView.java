@@ -103,19 +103,19 @@ public class ZoomView extends View implements Callback {
         mapPaint.setFilterBitmap(true);
         transform = new Transformation();
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_DepMapView, defStyle, 0);
-        int resourceId = a.getResourceId(R.styleable.com_zoomableview_DepMapView_mapref, 0);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_ZoomView, defStyle, 0);
+        int resourceId = a.getResourceId(R.styleable.com_zoomableview_ZoomView_mapref, 0);
         a.recycle();
 
         if (resourceId != 0) {
             setMap(resourceId);
         }
 
-        mAutoZoomLevel = a.getFloat(R.styleable.com_zoomableview_DepMapView_autoZoomLevel, 2f);
-        mAutoZoomFill = a.getBoolean(R.styleable.com_zoomableview_DepMapView_autoZoomFill, mAutoZoomLevel < 0);
+        mAutoZoomLevel = a.getFloat(R.styleable.com_zoomableview_ZoomView_autoZoomLevel, 2f);
+        mAutoZoomFill = a.getBoolean(R.styleable.com_zoomableview_ZoomView_autoZoomFill, mAutoZoomLevel < 0);
 
-        mMaxZoomLevel = a.getFloat(R.styleable.com_zoomableview_DepMapView_maxZoomLevel, 3f);
-        mMaxZoomFill = a.getBoolean(R.styleable.com_zoomableview_DepMapView_maxZoomFill, mMaxZoomLevel < 0);
+        mMaxZoomLevel = a.getFloat(R.styleable.com_zoomableview_ZoomView_maxZoomLevel, 3f);
+        mMaxZoomFill = a.getBoolean(R.styleable.com_zoomableview_ZoomView_maxZoomFill, mMaxZoomLevel < 0);
 
         if (DEBUG) debugPaint = new Paint();
     }

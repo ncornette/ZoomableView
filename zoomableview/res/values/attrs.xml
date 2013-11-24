@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="com.zoomableview.DepMapView">
+    <declare-styleable name="com.zoomableview.ZoomView">
         <attr name="mapref" format="reference" />
 
         <attr name="autoZoomFill" format="boolean" />
@@ -17,6 +17,10 @@
 
         <!-- 1: like normal, 0,3 (default), 0: no overscroll -->
         <attr name="overScrollTranslateFactor" format="float" />
-    </declare-styleable>
+
+        <attr name="minScaleFactor" format="float" />
+        <attr name="maxScaleFactor" format="float" />
+        
+        </declare-styleable>
 
 </resources>

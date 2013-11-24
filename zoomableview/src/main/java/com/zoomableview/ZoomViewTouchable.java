@@ -120,13 +120,13 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
         gestureScanner = new GestureDetector(getContext(), this);
         gestureScanner.setOnDoubleTapListener(this);
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_DepMapView, defStyle, 0);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_ZoomView, defStyle, 0);
 
-        mDoubleTapZoom = a.getBoolean(R.styleable.com_zoomableview_DepMapView_doubletabZoom, true);
-        mflingScale = a.getFloat(R.styleable.com_zoomableview_DepMapView_flingScale, 3.0f);
+        mDoubleTapZoom = a.getBoolean(R.styleable.com_zoomableview_ZoomView_doubletabZoom, true);
+        mflingScale = a.getFloat(R.styleable.com_zoomableview_ZoomView_flingScale, 3.0f);
         decelerateInterpolator = new DecelerateInterpolator(mflingScale);
 
-        float overScrollRate = a.getFloat(R.styleable.com_zoomableview_DepMapView_overScrollTranslateFactor, 0.3f);
+        float overScrollRate = a.getFloat(R.styleable.com_zoomableview_ZoomView_overScrollTranslateFactor, 0.3f);
 
         if (overScrollRate == 0) {
             mOverScroller = new ScrollStop();

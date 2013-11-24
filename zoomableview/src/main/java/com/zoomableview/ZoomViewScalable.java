@@ -2,6 +2,7 @@ package com.zoomableview;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Matrix;
 import android.os.Build;
 import android.os.Message;
@@ -25,19 +26,27 @@ public class ZoomViewScalable extends ZoomViewTouchable implements ScaleListener
     private float[] matrixOriginValues = new float[9];
     Matrix savedMatrix = new Matrix();
     private ScaleHandler mScaleHandler;
+    private float mMinScale;
+    private float mMaxScale;
 
     public ZoomViewScalable(Context context) {
-        super(context);
-        init();
+        this(context, null, 0);
     }
 
     public ZoomViewScalable(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
+        this(context, attrs, 0);
     }
 
     public ZoomViewScalable(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_ZoomView, defStyle, 0);
+
+        mMinScale = a.getFloat(R.styleable.com_zoomableview_ZoomView_minScaleFactor, 0.66667f);
+        mMaxScale = a.getFloat(R.styleable.com_zoomableview_ZoomView_maxScaleFactor, 5f);
+
+        a.recycle();
+
         init();
     }
 
@@ -77,8 +86,8 @@ public class ZoomViewScalable extends ZoomViewTouchable implements ScaleListener
             savedMatrix.set(matrix);
             matrix.postScale(scaleFactor, scaleFactor, focusX, focusY);
             matrix.getValues(matrixValues);
-            if (matrixValues[Matrix.MSCALE_X] < matrixOriginValues[Matrix.MSCALE_X] / 1.5f ||
-                    matrixValues[Matrix.MSCALE_X] > matrixOriginValues[Matrix.MSCALE_X] * 5f) {
+            if (matrixValues[Matrix.MSCALE_X] < matrixOriginValues[Matrix.MSCALE_X] * mMinScale ||
+                    matrixValues[Matrix.MSCALE_X] > matrixOriginValues[Matrix.MSCALE_X] * mMaxScale) {
                 matrix.set(savedMatrix);
             } else {
                 invalidate();
