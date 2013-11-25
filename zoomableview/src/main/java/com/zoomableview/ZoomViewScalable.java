@@ -127,7 +127,7 @@ public class ZoomViewScalable extends ZoomViewTouchable implements ScaleListener
 
         mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
         mapScaleAnim.setInterpolator(new BounceInterpolator());
-        mapScaleAnim.start();
+        mapScaleAnim.startNow();
         Message.obtain(mapZoomHandler).sendToTarget();
     }
 

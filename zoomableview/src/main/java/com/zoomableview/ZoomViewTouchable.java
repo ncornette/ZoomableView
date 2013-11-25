@@ -216,7 +216,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
             matrixTranslate.setRectToRect(rectMapOrigin, rectMapUpdate, ScaleToFit.FILL);
             mapScaleAnim = new ZoomScaleAnim(matrix, matrixTranslate, 200);
             mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
-            mapScaleAnim.start();
+            mapScaleAnim.startNow();
             Message.obtain(mapZoomHandler).sendToTarget();
         }
     }
@@ -245,7 +245,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
                 mapScaleAnim = new ZoomScaleAnim(matrix, pointF[0], pointF[1], getWidth() / 2, getHeight() / 2, 1, 500);
             }
             mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
-            mapScaleAnim.start();
+            mapScaleAnim.startNow();
             Message.obtain(mapZoomHandler).sendToTarget();
         }
     }

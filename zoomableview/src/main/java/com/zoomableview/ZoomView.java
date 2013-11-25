@@ -153,7 +153,7 @@ public class ZoomView extends View implements Callback {
         float targetZoomLevel = getOriginZoomLevel() * getAutoZoomLevel() / getCurrentZoomLevel();
         mapScaleAnim = new ZoomScaleAnim(matrix, x, y, getWidth() / 2, getHeight() / 2, targetZoomLevel, 500);
         mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
-        mapScaleAnim.start();
+        mapScaleAnim.startNow();
         startZoomAnimation();
         zoomed = true;
     }
@@ -169,7 +169,7 @@ public class ZoomView extends View implements Callback {
     public void zoomOut(int duration) {
         mapScaleAnim = new ZoomScaleAnim(matrix, matrixOrigin, duration);
         mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
-        mapScaleAnim.start();
+        mapScaleAnim.startNow();
         startZoomAnimation();
         zoomed = false;
     }
