@@ -275,7 +275,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
             float velocityY) {
         if (DEBUG)
             Log.v(TAG, "onFling veloxity x:" + velocityX + " velocity y:" + velocityY);
-        if (!zooming() && (movedX || movedY)) {
+        if (movedX || movedY) {
             mapScaleAnim = new ZoomScaleAnim(matrix, 0, 0, velocityX / mflingScale, velocityY / mflingScale, 1, 1000);
             mapScaleAnim.setInterpolator(decelerateInterpolator);
             mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());

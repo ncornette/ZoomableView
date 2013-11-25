@@ -62,6 +62,7 @@ public class ZoomView extends View implements Callback {
             case ANIM_START:
                 if (DEBUG)
                     Log.v(TAG, "Animation Start");
+                msg.getTarget().removeMessages(ANIM_START);
                 msg.getTarget().removeMessages(ANIM_CONTINUE);
                 onAnimationStart();
 
