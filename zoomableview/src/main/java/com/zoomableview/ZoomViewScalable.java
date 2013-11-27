@@ -8,7 +8,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.animation.BounceInterpolator;
+import android.view.animation.OvershootInterpolator;
 
 import com.zoomableview.ScaleHandler.ScaleListener;
 
@@ -20,6 +20,7 @@ import com.zoomableview.ScaleHandler.ScaleListener;
 @TargetApi(Build.VERSION_CODES.DONUT)
 public class ZoomViewScalable extends ZoomViewTouchable implements ScaleListener {
 
+    private static final OvershootInterpolator overshootInterpolator = new OvershootInterpolator();
     private static final String TAG = ZoomViewScalable.class.getSimpleName();
     private float[] matrixValues = new float[9];
     private float[] matrixOriginValues = new float[9];
@@ -124,7 +125,7 @@ public class ZoomViewScalable extends ZoomViewTouchable implements ScaleListener
             return;
         }
 
-        mapScaleAnim.setInterpolator(new BounceInterpolator());
+        mapScaleAnim.setInterpolator(overshootInterpolator);
         startZoomAnimation();
     }
 
