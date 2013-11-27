@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Matrix;
 import android.os.Build;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -99,7 +98,7 @@ public class ZoomViewScalable extends ZoomViewTouchable implements ScaleListener
     @Override
     public boolean onScaleBegin(float scaleFactor, float focusX, float focusY) {
         if (DEBUG)
-            Log.v(TAG, "Scale Begin");
+            Log.d(TAG, "Scale Begin");
         mapListener.onSingleTapCancelled();
         mapListener.onTouchScale(scaleFactor, focusX, focusY);
         scaling = true;
@@ -110,7 +109,7 @@ public class ZoomViewScalable extends ZoomViewTouchable implements ScaleListener
     @Override
     public void onScaleEnd(float scaleFactor, float focusX, float focusY) {
         if (DEBUG)
-            Log.v(TAG, "Scale End");
+            Log.d(TAG, "Scale End");
         updateDiffRect();
         matrix.getValues(matrixValues);
         scaling = false;
@@ -125,10 +124,8 @@ public class ZoomViewScalable extends ZoomViewTouchable implements ScaleListener
             return;
         }
 
-        mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
         mapScaleAnim.setInterpolator(new BounceInterpolator());
-        mapScaleAnim.startNow();
-        Message.obtain(mapZoomHandler).sendToTarget();
+        startZoomAnimation();
     }
 
 }

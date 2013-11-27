@@ -8,7 +8,6 @@ import android.graphics.Matrix;
 import android.graphics.Matrix.ScaleToFit;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -186,13 +185,13 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
         if (event.getAction() == MotionEvent.ACTION_UP) {
             if (DEBUG) Log.v(TAG, "Action_Up");
             if (!zooming() && (movedX || movedY)) {
-                translateTargetPosition();
+                restoreInitialPosition();
             }
         }
         return gestureScanner.onTouchEvent(event);
     }
 
-    private void translateTargetPosition() {
+    private void restoreInitialPosition() {
         // Will start animation for the image to return in its bounds
         updateDiffRect();
         if (rectMap.width() < getWidth()) {
@@ -215,9 +214,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
             // Create matrix for translation from current rect to new rect
             matrixTranslate.setRectToRect(rectMapOrigin, rectMapUpdate, ScaleToFit.FILL);
             mapScaleAnim = new ZoomScaleAnim(matrix, matrixTranslate, 200);
-            mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
-            mapScaleAnim.startNow();
-            Message.obtain(mapZoomHandler).sendToTarget();
+            startZoomAnimation();
         }
     }
 
@@ -246,7 +243,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
             }
             mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
             mapScaleAnim.startNow();
-            Message.obtain(mapZoomHandler).sendToTarget();
+            startZoomAnimation();
         }
     }
 
@@ -278,16 +275,15 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
         if (movedX || movedY) {
             mapScaleAnim = new ZoomScaleAnim(matrix, 0, 0, velocityX / mflingScale, velocityY / mflingScale, 1, 1000);
             mapScaleAnim.setInterpolator(decelerateInterpolator);
-            mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
-            mapScaleAnim.startNow();
-            Message.obtain(mapZoomHandler).sendToTarget();
+            startZoomAnimation();
         }
         return false;
     }
 
     @Override
     public void onLongPress(MotionEvent e) {
-        if (DEBUG) Log.v(TAG, "onLongPress");
+        if (DEBUG)
+            Log.d(TAG, "onLongPress");
 
     }
 
@@ -340,7 +336,8 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
 
     @Override
     public void onShowPress(MotionEvent e) {
-        if (DEBUG) Log.v(TAG, "onShowPress");
+        if (DEBUG)
+            Log.d(TAG, "onShowPress");
     }
 
     @Override

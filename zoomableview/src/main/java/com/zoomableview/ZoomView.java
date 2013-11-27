@@ -61,7 +61,7 @@ public class ZoomView extends View implements Callback {
         switch (msg.what) {
             case ANIM_START:
                 if (DEBUG)
-                    Log.v(TAG, "Animation Start");
+                    Log.d(TAG, "Animation Start");
                 msg.getTarget().removeMessages(ANIM_START);
                 msg.getTarget().removeMessages(ANIM_CONTINUE);
                 onAnimationStart();
@@ -77,7 +77,7 @@ public class ZoomView extends View implements Callback {
                 msg.getTarget().removeMessages(ANIM_CONTINUE);
                 onAnimationEnd();
                 if (DEBUG) {
-                    Log.v(TAG, "Animation End");
+                    Log.d(TAG, "Animation End");
                     invalidate();
                 }
                 break;
@@ -106,7 +106,6 @@ public class ZoomView extends View implements Callback {
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_ZoomView, defStyle, 0);
         int resourceId = a.getResourceId(R.styleable.com_zoomableview_ZoomView_mapref, 0);
-        a.recycle();
 
         if (resourceId != 0) {
             setMap(resourceId);
@@ -117,6 +116,8 @@ public class ZoomView extends View implements Callback {
 
         mMaxZoomLevel = a.getFloat(R.styleable.com_zoomableview_ZoomView_maxZoomLevel, 3f);
         mMaxZoomFill = a.getBoolean(R.styleable.com_zoomableview_ZoomView_maxZoomFill, mMaxZoomLevel < 0);
+
+        a.recycle();
 
         if (DEBUG) debugPaint = new Paint();
     }
@@ -153,14 +154,14 @@ public class ZoomView extends View implements Callback {
     public void zoomOnScreen(float x, float y) {
         float targetZoomLevel = getOriginZoomLevel() * getAutoZoomLevel() / getCurrentZoomLevel();
         mapScaleAnim = new ZoomScaleAnim(matrix, x, y, getWidth() / 2, getHeight() / 2, targetZoomLevel, 500);
-        mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
-        mapScaleAnim.startNow();
         startZoomAnimation();
         zoomed = true;
     }
 
     protected void startZoomAnimation() {
-        Message.obtain(mapZoomHandler).sendToTarget();
+        mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
+        mapScaleAnim.startNow();
+        Message.obtain(mapZoomHandler, ANIM_START).sendToTarget();
     }
 
     public void zoomOut() {
@@ -169,8 +170,6 @@ public class ZoomView extends View implements Callback {
 
     public void zoomOut(int duration) {
         mapScaleAnim = new ZoomScaleAnim(matrix, matrixOrigin, duration);
-        mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
-        mapScaleAnim.startNow();
         startZoomAnimation();
         zoomed = false;
     }
@@ -183,7 +182,7 @@ public class ZoomView extends View implements Callback {
      */
     public void zoomToggle(float onX, float onY) {
         if (DEBUG)
-            Log.v(TAG, String.format("zoomToggle (zoomed:%b)", zoomed));
+            Log.d(TAG, String.format("zoomToggle (zoomed:%b)", zoomed));
         if (!zoomed) {
             zoomOnScreen(onX, onY);
         } else {
@@ -215,7 +214,8 @@ public class ZoomView extends View implements Callback {
         } else {
             ret = mAutoZoomLevel;
         }
-        if (DEBUG) Log.v(TAG, "getAutoZoomLevel, ret: " + ret);
+        if (DEBUG)
+            Log.d(TAG, "getAutoZoomLevel, ret: " + ret);
         return ret;
     }
 
@@ -252,7 +252,8 @@ public class ZoomView extends View implements Callback {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        if (DEBUG) Log.v(TAG, "onLayout. changed:"+ changed);
+        if (DEBUG)
+            Log.v(TAG, "onLayout. changed:" + changed);
         if (map == null)
             return;
         if (mapScaleAnim != null && changed)
@@ -302,7 +303,7 @@ public class ZoomView extends View implements Callback {
 
         if (DEBUG) {
             matrix.getValues(matrixValues);
-            Log.v(TAG, "onDraw, x:" + matrixValues[matrix.MTRANS_X] + ", y:" + matrixValues[matrix.MTRANS_Y]);
+            Log.v(TAG, "onDraw, x:" + matrixValues[Matrix.MTRANS_X] + ", y:" + matrixValues[Matrix.MTRANS_Y]);
         }
 
         // Draw full map
