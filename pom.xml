@@ -11,6 +11,12 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<platform.version> 4.1.1.4</platform.version>
 		<android.plugin.version>3.6.0</android.plugin.version>
+
+        <!-- configure you personnal maven repository here -->
+        <!-- or type: mvn clean deploy -Drepo.id=my-maven-repository -Drepo.url=http://my-maven-repo/maven/repository  -->
+        <!-- it is recommended you create a deploy.sh file executing the maven command below -->
+        <repo.id>repository</repo.id>
+        <repo.url>http://127.0.0.1:8080/maven/repository</repo.url>
 	</properties>
 
 	<build>
@@ -48,8 +54,8 @@
 
     <distributionManagement>
         <repository>
-            <id>nkouml-maven-repository</id>
-            <url>dav:http://nkouml.no-ip.org/maven/repository</url>
+            <id>${repo.id}</id>
+            <url>${repo.url}</url>
         </repository>
     </distributionManagement>
 	
