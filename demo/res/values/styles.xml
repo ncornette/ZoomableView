@@ -20,7 +20,7 @@
     <style name="demo_zoom_default">
         <item name="autoZoomFill">true</item>
         <item name="maxZoomLevel">3</item>
-        <item name="flingScale">4</item>
+        <item name="flingScale">1</item>
         <item name="overScrollTranslateFactor">0.3</item>
     </style>
     
