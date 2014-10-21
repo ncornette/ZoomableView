@@ -10,7 +10,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<platform.version> 4.1.1.4</platform.version>
-		<android.plugin.version>3.6.0</android.plugin.version>
+		<android.plugin.version>3.8.2</android.plugin.version>
 
         <!-- configure you personnal maven repository here -->
         <!-- or type: mvn clean deploy -Drepo.id=my-maven-repository -Drepo.url=http://my-maven-repo/maven/repository  -->
