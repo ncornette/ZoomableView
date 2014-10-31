@@ -11,21 +11,17 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.os.Handler;
-import android.os.Handler.Callback;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.Transformation;
+
+import com.zoomableview.ZoomScaleAnim.AnimatedMatrix;
 
 /**
  * @author Nicolas CORNETTE
  * Base Class for Zoomable View, zoom level can be controlled by code
  */
-public class ZoomView extends View implements Callback {
+public class ZoomView extends View {
 
     protected static final String TAG = ZoomView.class.getSimpleName();
 
@@ -48,47 +44,13 @@ public class ZoomView extends View implements Callback {
     private boolean mMaxZoomFill;
     private float mMaxZoomLevel;
 
-    private Transformation transform;
     protected boolean zoomed;
-    protected Animation mapScaleAnim;
 
     protected static final int ANIM_START = 0;
     protected static final int ANIM_CONTINUE = 1;
     protected static final int ANIM_STOP = 2;
 
-    @Override
-    public boolean handleMessage(Message msg) {
-        switch (msg.what) {
-            case ANIM_START:
-                if (DEBUG)
-                    Log.d(TAG, "Animation Start");
-                msg.getTarget().removeMessages(ANIM_START);
-                msg.getTarget().removeMessages(ANIM_CONTINUE);
-                onAnimationStart();
-
-            case ANIM_CONTINUE:
-                msg.getTarget().sendEmptyMessage(mapScaleAnim.hasEnded() ? ANIM_STOP : ANIM_CONTINUE);
-                mapScaleAnim.getTransformation(AnimationUtils.currentAnimationTimeMillis(), transform);
-                matrix.set(transform.getMatrix());
-                invalidate();
-                break;
-
-            case ANIM_STOP:
-                msg.getTarget().removeMessages(ANIM_CONTINUE);
-                onAnimationEnd();
-                if (DEBUG) {
-                    Log.d(TAG, "Animation End");
-                    invalidate();
-                }
-                break;
-
-            default:
-                break;
-        }
-        return true;
-    }
-
-    Handler mapZoomHandler = new Handler(this);
+    protected AnimatedMatrix mMatrixAnimator = new ZoomScaleAnim.AnimatedMatrix(matrix, this);
 
     public ZoomView(Context context) {
         this(context, null);
@@ -102,7 +64,6 @@ public class ZoomView extends View implements Callback {
         super(context, attrs, defStyle);
         mapPaint = new Paint();
         mapPaint.setFilterBitmap(true);
-        transform = new Transformation();
 
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.com_zoomableview_ZoomView, defStyle, 0);
         int resourceId = a.getResourceId(R.styleable.com_zoomableview_ZoomView_mapref, 0);
@@ -153,15 +114,8 @@ public class ZoomView extends View implements Callback {
 
     public void zoomOnScreen(float x, float y) {
         float targetZoomLevel = getOriginZoomLevel() * getAutoZoomLevel() / getCurrentZoomLevel();
-        mapScaleAnim = new ZoomScaleAnim(matrix, x, y, getWidth() / 2, getHeight() / 2, targetZoomLevel, 500);
-        startZoomAnimation();
+        mMatrixAnimator.animate(targetZoomLevel, getWidth() / 2, getHeight() / 2, 500);
         zoomed = true;
-    }
-
-    protected void startZoomAnimation() {
-        mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
-        mapScaleAnim.startNow();
-        Message.obtain(mapZoomHandler, ANIM_START).sendToTarget();
     }
 
     public void zoomOut() {
@@ -169,8 +123,7 @@ public class ZoomView extends View implements Callback {
     }
 
     public void zoomOut(int duration) {
-        mapScaleAnim = new ZoomScaleAnim(matrix, matrixOrigin, duration);
-        startZoomAnimation();
+        mMatrixAnimator.animateTo(matrixOrigin, 500);
         zoomed = false;
     }
 
@@ -256,8 +209,8 @@ public class ZoomView extends View implements Callback {
             Log.v(TAG, "onLayout. changed:" + changed);
         if (map == null)
             return;
-        if (mapScaleAnim != null && changed)
-            mapZoomHandler.sendMessageAtFrontOfQueue(Message.obtain(mapZoomHandler, ANIM_STOP));
+        if (mMatrixAnimator != null && changed)
+            mMatrixAnimator.stop();
         // Save previous view Rect
         tmpRect.set(rectView);
         rectView.set(0f, 0f, right - left, bottom - top);
@@ -271,6 +224,7 @@ public class ZoomView extends View implements Callback {
             matrixValues[Matrix.MTRANS_Y] += (rectView.height() - tmpRect.height()) / 2;
             matrix.setValues(matrixValues);
             zoomed = matrixValues[Matrix.MSCALE_X] != matrixOriginValues[Matrix.MSCALE_X];
+            mMatrixAnimator.set(matrix);
         }
     }
 

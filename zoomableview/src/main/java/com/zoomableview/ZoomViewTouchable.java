@@ -14,7 +14,6 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
-import android.view.animation.DecelerateInterpolator;
 
 import com.zoomableview.scroller.ScrollDelegate;
 import com.zoomableview.scroller.ScrollOver;
@@ -102,7 +101,6 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
     private boolean mDoubleTapZoom;
     private Matrix matrixTranslate = new Matrix();
     private float mflingScale;
-    private DecelerateInterpolator decelerateInterpolator;
 
     private ScrollDelegate mOverScroller;
 
@@ -123,7 +121,6 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
 
         mDoubleTapZoom = a.getBoolean(R.styleable.com_zoomableview_ZoomView_doubletabZoom, true);
         mflingScale = a.getFloat(R.styleable.com_zoomableview_ZoomView_flingScale, 3.0f);
-        decelerateInterpolator = new DecelerateInterpolator(mflingScale);
 
         float overScrollRate = a.getFloat(R.styleable.com_zoomableview_ZoomView_overScrollTranslateFactor, 0.3f);
 
@@ -176,7 +173,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
             Log.v(TAG, "onDown");
         mapListener.onTouch(e.getX(), e.getY());
         updateDiffRect();
-        mapZoomHandler.removeMessages(ANIM_CONTINUE);
+        mMatrixAnimator.stop();
         return true;
     }
 
@@ -213,8 +210,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
         if (!equalsRect(rectMapUpdate, rectMap)) {
             // Create matrix for translation from current rect to new rect
             matrixTranslate.setRectToRect(rectMapOrigin, rectMapUpdate, ScaleToFit.FILL);
-            mapScaleAnim = new ZoomScaleAnim(matrix, matrixTranslate, 200);
-            startZoomAnimation();
+            mMatrixAnimator.animateTo(matrixTranslate, 500);
         }
     }
 
@@ -236,14 +232,11 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
         if ((zoomed || zoomIfNeeded)) {
             matrix.mapPoints(pointF);
             if (!zoomed && zoomIfNeeded) {
-                mapScaleAnim = new ZoomScaleAnim(matrix, pointF[0], pointF[1], getWidth() / 2, getHeight() / 2, getAutoZoomLevel(), 500);
+                mMatrixAnimator.animate(getAutoZoomLevel(), getWidth() / 2, getHeight() / 2, 500);
                 zoomed = true;
             } else {
-                mapScaleAnim = new ZoomScaleAnim(matrix, pointF[0], pointF[1], getWidth() / 2, getHeight() / 2, 1, 500);
+                mMatrixAnimator.animate(1, getWidth() / 2, getHeight() / 2, 500);
             }
-            mapScaleAnim.initialize((int) rectMapOrigin.width(), (int) rectMapOrigin.height(), getWidth(), getHeight());
-            mapScaleAnim.startNow();
-            startZoomAnimation();
         }
     }
 
@@ -273,9 +266,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
         if (DEBUG)
             Log.v(TAG, "onFling veloxity x:" + velocityX + " velocity y:" + velocityY);
         if (movedX || movedY) {
-            mapScaleAnim = new ZoomScaleAnim(matrix, 0, 0, velocityX / mflingScale, velocityY / mflingScale, 1, 1000);
-            mapScaleAnim.setInterpolator(decelerateInterpolator);
-            startZoomAnimation();
+            mMatrixAnimator.animate(getCurrentZoomLevel(), velocityX / mflingScale, velocityY / mflingScale, 500);
         }
         return false;
     }
@@ -323,7 +314,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
             }
 
             if (movedX || movedY) {
-                invalidate();
+                mMatrixAnimator.set(matrix);
                 return true;
             }
         }
@@ -331,7 +322,7 @@ public class ZoomViewTouchable extends ZoomView implements OnDoubleTapListener, 
     }
 
     boolean zooming() {
-        return mapZoomHandler.hasMessages(ANIM_CONTINUE) || mapZoomHandler.hasMessages(ANIM_START);
+        return mMatrixAnimator.isRunning();
     }
 
     @Override

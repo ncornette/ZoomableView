@@ -116,17 +116,15 @@ public class ZoomViewScalable extends ZoomViewTouchable implements ScaleListener
         scaling = false;
 
         if (matrixValues[Matrix.MSCALE_X] < matrixOriginValues[Matrix.MSCALE_X]) {
-            mapScaleAnim = new ZoomScaleAnim(matrix, matrixOrigin, 200);
+            mMatrixAnimator.animateTo(matrixOrigin, 500);
             zoomed = false;
         } else if (matrixValues[Matrix.MSCALE_X] > matrixOriginValues[Matrix.MSCALE_X] * getMaxZoomLevel()) {
-            mapScaleAnim = new ZoomScaleAnim(matrix, getWidth() / 2, getHeight() / 2, getWidth() / 2, getHeight() / 2,
-                    matrixOriginValues[Matrix.MSCALE_X] / matrixValues[Matrix.MSCALE_X] * getMaxZoomLevel(), 200);
+            mMatrixAnimator.animate(matrixOriginValues[Matrix.MSCALE_X] / matrixValues[Matrix.MSCALE_X] * getMaxZoomLevel(),
+                    getWidth() / 2, getHeight() / 2, 500);
         } else {
             return;
         }
 
-        mapScaleAnim.setInterpolator(overshootInterpolator);
-        startZoomAnimation();
     }
 
 }

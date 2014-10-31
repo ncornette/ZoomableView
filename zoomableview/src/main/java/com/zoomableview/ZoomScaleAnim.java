@@ -1,7 +1,12 @@
 package com.zoomableview;
 
+import android.animation.Animator;
+import android.animation.Animator.AnimatorListener;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.graphics.Matrix;
 import android.graphics.RectF;
+import android.view.View;
 import android.view.animation.AnimationSet;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
@@ -10,6 +15,132 @@ import android.view.animation.TranslateAnimation;
  * @author nic Scale & Translate animation
  */
 public class ZoomScaleAnim extends AnimationSet {
+
+    private static abstract class AnimatedValues implements AnimatorListener {
+        float x;
+        float y;
+        float scale;
+        private Animator mScaleXYAnimator;
+
+        public void setX(float x) {
+            this.x = x;
+            onValueUpdate();
+        }
+
+        public void setY(float y) {
+            this.y = y;
+            onValueUpdate();
+        }
+
+        public void setScale(float scale) {
+            this.scale = scale;
+            onValueUpdate();
+        }
+
+        public void setScaleXY(float scale, float x, float y) {
+            this.scale = scale;
+            this.x = x;
+            this.y = y;
+            onValueUpdate();
+        }
+
+        public void stop() {
+            if (!isRunning()) {
+                return;
+            }
+
+            mScaleXYAnimator.removeAllListeners();
+            mScaleXYAnimator.cancel();
+            mScaleXYAnimator = null;
+        }
+
+        public void animate(float toScale, float toX, float toY, int duration) {
+            if (isRunning()) {
+                stop();
+            } else {
+                ObjectAnimator scaleAnim = ObjectAnimator.ofFloat(this, "scale", scale, toScale);
+                ObjectAnimator xAnim = ObjectAnimator.ofFloat(this, "x", x, toX);
+                ObjectAnimator yAnim = ObjectAnimator.ofFloat(this, "y", y, toY);
+
+                AnimatorSet animatorSet = new AnimatorSet();
+                animatorSet.playTogether(scaleAnim, xAnim, yAnim);
+
+                mScaleXYAnimator = animatorSet;
+                // mScaleXYAnimator = ObjectAnimator.ofFloat(this, "scaleXY",
+                // scale, toScale, x, toX, y, toY);
+
+                mScaleXYAnimator.addListener(this);
+                mScaleXYAnimator.setDuration(duration);
+                mScaleXYAnimator.start();
+            }
+        }
+
+        public boolean isRunning() {
+            return mScaleXYAnimator != null && mScaleXYAnimator.isRunning();
+        }
+
+        @Override
+        public void onAnimationStart(Animator animation) {
+
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            mScaleXYAnimator = null;
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animation) {
+        }
+
+        protected abstract void onValueUpdate();
+        
+    }
+
+    public static class AnimatedMatrix extends AnimatedValues {
+
+        private Matrix matrix;
+        private float[] mMatrixValues = new float[9];
+        private View mViewToInvalidate;
+
+        public AnimatedMatrix(Matrix m, View ViewToInvalidate) {
+            mViewToInvalidate = ViewToInvalidate;
+            set(m);
+        }
+
+        public void set(Matrix m) {
+            matrix = m;
+            m.getValues(mMatrixValues);
+            scale = mMatrixValues[Matrix.MSCALE_X];
+            x = mMatrixValues[Matrix.MTRANS_X];
+            y = mMatrixValues[Matrix.MTRANS_Y];
+            onValueUpdate();
+        }
+
+        @Override
+        protected void onValueUpdate() {
+            mMatrixValues[Matrix.MSCALE_X] = scale;
+            mMatrixValues[Matrix.MSCALE_Y] = scale;
+            mMatrixValues[Matrix.MTRANS_X] = x;
+            mMatrixValues[Matrix.MTRANS_Y] = y;
+            matrix.setValues(mMatrixValues);
+            if (mViewToInvalidate != null) {
+                mViewToInvalidate.invalidate();
+            }
+        }
+
+        public void animateTo(Matrix m, int duration) {
+            m.getValues(mMatrixValues);
+            animate(mMatrixValues[Matrix.MSCALE_X],
+                    mMatrixValues[Matrix.MTRANS_X],
+                    mMatrixValues[Matrix.MTRANS_Y], duration);
+        }
+
+    }
 
     private float[] iMatrixs = new float[9];
     private float[] tMatrixs = new float[9];
@@ -33,15 +164,18 @@ public class ZoomScaleAnim extends AnimationSet {
             reset();
         }
 
-        scaleAnimation = new ScaleAnimation(fromScale, toScale, fromScale, toScale);
-        scaleAnimation.setDuration(mDuration);
-        addAnimation(scaleAnimation);
+        // ObjectAnimator scaleXYAnimator = ObjectAnimator.ofFloat(mAnimatedValues, "scaleXY",
+        // fromScale, toScale, fromX, toX, fromY, toY);
 
-        translateAnimation = new TranslateAnimation(fromX, toX, fromY, toY);
-        translateAnimation.setDuration(mDuration);
-        addAnimation(translateAnimation);
-
-        setFillAfter(true);
+        // scaleAnimation = new ScaleAnimation(fromScale, toScale, fromScale, toScale);
+        // scaleAnimation.setDuration(mDuration);
+        // addAnimation(scaleAnimation);
+        //
+        // translateAnimation = new TranslateAnimation(fromX, toX, fromY, toY);
+        // translateAnimation.setDuration(mDuration);
+        // addAnimation(translateAnimation);
+        //
+        // setFillAfter(true);
     }
 
     /**

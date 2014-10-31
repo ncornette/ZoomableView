@@ -16,9 +16,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.google.android</groupId>
+			<groupId>android</groupId>
 			<artifactId>android</artifactId>
-			<version>${platform.version}</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
@@ -32,7 +31,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<sdk>
-						<platform>17</platform>
+						<platform>19</platform>
 					</sdk>
 				</configuration>
 			</plugin>

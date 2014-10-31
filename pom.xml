@@ -9,8 +9,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<platform.version> 4.1.1.4</platform.version>
-		<android.plugin.version>3.8.2</android.plugin.version>
+		<platform.version>4.4.2_r3</platform.version>
+		<android.plugin.version>3.9.0-rc.3</android.plugin.version>
 
         <!-- configure you personnal maven repository here -->
         <!-- or type: mvn clean deploy -Drepo.id=my-maven-repository -Drepo.url=http://my-maven-repo/maven/repository  -->
@@ -18,6 +18,17 @@
         <repo.id>repository</repo.id>
         <repo.url>http://127.0.0.1:8080/maven/repository</repo.url>
 	</properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>android</groupId>
+                <artifactId>android</artifactId>
+                <version>${platform.version}</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 	<build>
 		<plugins>
@@ -28,7 +39,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<sdk>
-						<platform>17</platform>
+						<platform>19</platform>
 					</sdk>
 				</configuration>
 			</plugin>
