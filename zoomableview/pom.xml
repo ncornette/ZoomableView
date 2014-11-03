@@ -11,7 +11,7 @@
 
 
 	<artifactId>zoomableview</artifactId>
-	<packaging>apklib</packaging>
+	<packaging>aar</packaging>
 	<name>zoomableview</name>
 
 	<dependencies>

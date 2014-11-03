@@ -14,14 +14,13 @@
 		<dependency>
 			<groupId>android</groupId>
 			<artifactId>android</artifactId>
-			<scope>provided</scope>
 		</dependency>
-		<dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
-			<artifactId>zoomableview</artifactId>
+            <artifactId>zoomableview</artifactId>
             <version>${project.version}</version>
-            <type>apklib</type>
-		</dependency>
+            <type>aar</type>
+        </dependency>
 	</dependencies>
 	<build>
 		<finalName>${project.artifactId}</finalName>

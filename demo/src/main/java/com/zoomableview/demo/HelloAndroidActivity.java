@@ -1,8 +1,10 @@
-package com.zoomableview;
+package com.zoomableview.demo;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
+import com.zoomableview.ZoomViewTouchable;
+import com.zoomableview.demo.R;
 
 public class HelloAndroidActivity extends Activity {
 
@@ -27,7 +29,7 @@ public class HelloAndroidActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(com.zoomableview.R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 

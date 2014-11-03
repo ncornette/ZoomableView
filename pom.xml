@@ -15,8 +15,8 @@
         <!-- configure you personnal maven repository here -->
         <!-- or type: mvn clean deploy -Drepo.id=my-maven-repository -Drepo.url=http://my-maven-repo/maven/repository  -->
         <!-- it is recommended you create a deploy.sh file executing the maven command below -->
-        <repo.id>repository</repo.id>
-        <repo.url>http://127.0.0.1:8080/maven/repository</repo.url>
+        <repo.id>nkouml-maven-repository</repo.id>
+        <repo.url>http://nkouml.no-ip.org/maven/repository</repo.url>
 	</properties>
 
     <dependencyManagement>
@@ -62,6 +62,13 @@
         </extensions>
 
     </build>
+
+    <repositories>
+        <repository>
+            <id>${repo.id}</id>
+            <url>${repo.url}</url>
+        </repository>
+    </repositories>
 
     <distributionManagement>
         <repository>
