@@ -3,8 +3,6 @@ package com.zoomableview.demo;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
-import com.zoomableview.ZoomViewTouchable;
-import com.zoomableview.demo.R;
 
 public class HelloAndroidActivity extends Activity {
 
@@ -21,8 +19,8 @@ public class HelloAndroidActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        @SuppressWarnings("unused")
-        final ZoomViewTouchable zoomable = (ZoomViewTouchable) findViewById(R.id.zoomable);
+        // @SuppressWarnings("unused")
+//        final ZoomViewTouchable zoomable = (ZoomViewTouchable) findViewById(R.id.zoomable);
 
     }
 
