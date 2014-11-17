@@ -33,6 +33,8 @@ import com.nineoldandroids.animation.ValueAnimator.AnimatorUpdateListener;
 
 /**
  * @author nic
+ * <p>
+ * TODO: Use different {@link RectFEvaluator}s to check / modify rect before update
  *
  */
 public class ScaleZoomView extends View {
@@ -103,7 +105,7 @@ public class ScaleZoomView extends View {
                 GestureRectUpdater.scale(toRectF, scale, eventX, eventY);
 
                 // Offset to center on Touch Point
-                toRectF.offset(mClipBounds.centerX() - eventX, mClipBounds.centerY() - eventY);
+                // toRectF.offset(mClipBounds.centerX() - eventX, mClipBounds.centerY() - eventY);
 
                 return toRectF;
             }
@@ -146,12 +148,6 @@ public class ScaleZoomView extends View {
 
     private float getStartZoomLevel() {
         return mStartDisplayRect.width() / mSourceImgRect.width();
-    }
-
-    @Override
-    public boolean performClick() {
-        // TODO Auto-generated method stub
-        return super.performClick();
     }
 
     @Override
@@ -233,6 +229,7 @@ public class ScaleZoomView extends View {
     private static class GestureRectUpdater implements OnGestureListener, OnDoubleTapListener, OnScaleGestureListener, AnimatorUpdateListener {
 
         private RectF mOutRect;
+        private RectFEvaluator mRectFEvaluator;
         private Context mContext;
         private Rect tmpOutRect = new Rect();
         private Scroller mScroller;
@@ -256,6 +253,7 @@ public class ScaleZoomView extends View {
 
         private void setRect(RectF outRect) {
             mOutRect = outRect;
+            mRectFEvaluator = new RectFEvaluator(mOutRect);
         }
 
         private void finishAnimations() {
@@ -278,13 +276,11 @@ public class ScaleZoomView extends View {
 
         @Override
         public void onShowPress(MotionEvent e) {
-            // TODO Auto-generated method stub
 
         }
 
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -297,7 +293,6 @@ public class ScaleZoomView extends View {
 
         @Override
         public void onLongPress(MotionEvent e) {
-            // TODO Auto-generated method stub
 
         }
 
@@ -318,7 +313,6 @@ public class ScaleZoomView extends View {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            // TODO Auto-generated method stub
             return false;
         }
 
@@ -351,7 +345,7 @@ public class ScaleZoomView extends View {
             if (toRect == null)
                 return;
             finishAnimations();
-            mRectAnimator = ValueAnimator.ofObject(new RectFEvaluator(mOutRect), mOutRect, toRect);
+            mRectAnimator = ValueAnimator.ofObject(mRectFEvaluator, mOutRect, toRect);
             mRectAnimator.addUpdateListener(this);
             mRectAnimator.start();
         }
@@ -386,7 +380,6 @@ public class ScaleZoomView extends View {
 
         @Override
         public void onScaleEnd(ScaleGestureDetector detector) {
-            // TODO Auto-generated method stub
 
         }
 
